@@ -35,9 +35,6 @@ router.use(authenticateToken);
  */
 router.get('/', async (req, res) => {
   try {
-    console.log('DEBUG: Iniciando rota /api/stats');
-    console.log('DEBUG: Usuário:', req.user);
-    
     logger.info('Obtendo estatísticas globais', {
       service: 'roteiro-verade-backend',
       userId: req.user.id
@@ -46,22 +43,18 @@ router.get('/', async (req, res) => {
     // Contar roteiros
     const scriptsResult = await database.query('SELECT COUNT(*) as count FROM scripts');
     const scriptsCount = scriptsResult[0].count;
-    console.log('DEBUG: Scripts count:', scriptsCount);
     
     // Contar personagens (customizados)
     const charactersResult = await database.query('SELECT COUNT(*) as count FROM characters');
     const charactersCount = charactersResult[0].count;
-    console.log('DEBUG: Characters count:', charactersCount);
     
     // Contar compartilhamentos
     const sharesResult = await database.query('SELECT COUNT(*) as count FROM script_shares');
     const sharesCount = sharesResult[0].count;
-    console.log('DEBUG: Shares count:', sharesCount);
     
     // Contar usuários
     const usersResult = await database.query('SELECT COUNT(*) as count FROM users');
     const usersCount = usersResult[0].count;
-    console.log('DEBUG: Users count:', usersCount);
     
     // Roteiros por visibilidade (público/privado)
     const scriptsByVisibilityResult = await database.query(`
@@ -113,15 +106,10 @@ router.get('/', async (req, res) => {
       generatedAt: new Date().toISOString()
     };
 
-    console.log('DEBUG: Stats object:', JSON.stringify(stats, null, 2));
-    console.log('DEBUG: Enviando resposta...');
-
     res.json({
       success: true,
       data: stats
     });
-
-    console.log('DEBUG: Resposta enviada com sucesso');
 
   } catch (error) {
     logger.error('Erro ao obter estatísticas globais', {

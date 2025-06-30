@@ -138,6 +138,7 @@ npm start
 - `PUT /api/scripts/:id` - Atualizar roteiro
 - `DELETE /api/scripts/:id` - Remover roteiro
 - `GET /api/scripts/:id/export` - Exportar roteiro (PDF, TXT)
+  - **Atenção:** A exportação real para PDF/TXT ainda não está implementada. Atualmente, o endpoint retorna os dados do roteiro em JSON. Implementação da exportação para arquivo é uma feature pendente.
 - `GET /api/scripts/:id/stats` - Obter estatísticas de um roteiro
 
 ### Mensagens
@@ -146,7 +147,7 @@ npm start
 - `PUT /api/scripts/:id/messages/:messageId` - Editar mensagem
 - `DELETE /api/scripts/:id/messages/:messageId` - Remover mensagem
 - `POST /api/scripts/:id/messages/reorder` - Reordenar mensagens
-- `POST /api/scripts/:id/messages/:messageId/duplicate` - Duplicar mensagem
+- `POST /api/scripts/:id/messages/:messageId/duplicate` - Duplicar mensagem (removido, não disponível)
 
 ### Compartilhamento (Shares)
 - `GET /api/shares/script/:id` - Listar compartilhamentos de um roteiro

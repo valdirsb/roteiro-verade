@@ -75,11 +75,13 @@ class ScriptMessage {
       sql += ` ORDER BY ${orderField} ${orderDir}`;
 
       // Paginação
-      if (page && limit) {
-        const offset = (page - 1) * limit;
-        sql += ' LIMIT ? OFFSET ?';
-        params.push(limit, offset);
-      }
+      const safePage = parseInt(page, 10);
+      const safeLimit = parseInt(limit, 10);
+      const finalPage = Number.isFinite(safePage) && safePage > 0 ? safePage : 1;
+      const finalLimit = Number.isFinite(safeLimit) && safeLimit > 0 ? safeLimit : 10;
+      const offset = (finalPage - 1) * finalLimit;
+      // Interpolação direta de LIMIT/OFFSET
+      sql += ` LIMIT ${finalLimit} OFFSET ${offset}`;
 
       const rows = await database.query(sql, params);
       return rows.map(row => new ScriptMessage(row));
@@ -180,21 +182,25 @@ class ScriptMessage {
   // Reordenar mensagens
   static async reorderMessages(scriptId, messageIds) {
     try {
-      // Iniciar transação
-      await database.query('START TRANSACTION');
-
-      for (let i = 0; i < messageIds.length; i++) {
-        const sql = 'UPDATE script_messages SET order_index = ? WHERE id = ? AND script_id = ?';
-        await database.query(sql, [i, messageIds[i], scriptId]);
-      }
-
-      await database.query('COMMIT');
-      
+      await database.transaction(async (connection) => {
+        // 1. Atualize todos para um valor temporário negativo
+        for (let i = 0; i < messageIds.length; i++) {
+          await connection.execute(
+            'UPDATE script_messages SET order_index = ? WHERE id = ? AND script_id = ?',
+            [-(i + 1), messageIds[i], scriptId]
+          );
+        }
+        // 2. Atualize para o valor final
+        for (let i = 0; i < messageIds.length; i++) {
+          await connection.execute(
+            'UPDATE script_messages SET order_index = ? WHERE id = ? AND script_id = ?',
+            [i, messageIds[i], scriptId]
+          );
+        }
+      });
       logger.info(`Mensagens reordenadas no roteiro ${scriptId}`);
-      
       return true;
     } catch (error) {
-      await database.query('ROLLBACK');
       logger.error('Erro ao reordenar mensagens:', error);
       throw error;
     }
@@ -255,37 +261,19 @@ class ScriptMessage {
     }
   }
 
-  // Duplicar mensagem
-  static async duplicateMessage(messageId) {
-    try {
-      const originalMessage = await ScriptMessage.findById(messageId);
-      if (!originalMessage) {
-        throw new Error('Mensagem não encontrada');
+  // Normalizar índices de ordem das mensagens de um roteiro
+  static async normalizeOrderIndexes(scriptId) {
+    const messages = await ScriptMessage.findByScript(scriptId, { order_by: 'order_index', order_direction: 'ASC', page: 1, limit: 1000 });
+    await database.transaction(async (connection) => {
+      for (let i = 0; i < messages.length; i++) {
+        if (messages[i].order_index !== i) {
+          await connection.execute(
+            'UPDATE script_messages SET order_index = ? WHERE id = ? AND script_id = ?',
+            [i, messages[i].id, scriptId]
+          );
+        }
       }
-
-      // Criar nova mensagem com conteúdo duplicado
-      const newMessage = await ScriptMessage.create({
-        script_id: originalMessage.script_id,
-        character_id: originalMessage.character_id,
-        message: originalMessage.message,
-        order_index: originalMessage.order_index + 1
-      });
-
-      // Reordenar mensagens subsequentes
-      const sql = `
-        UPDATE script_messages 
-        SET order_index = order_index + 1 
-        WHERE script_id = ? AND order_index > ? AND id != ?
-      `;
-      await database.query(sql, [originalMessage.script_id, originalMessage.order_index, newMessage.id]);
-
-      logger.info(`Mensagem duplicada: ${newMessage.message.substring(0, 50)}...`);
-      
-      return newMessage;
-    } catch (error) {
-      logger.error('Erro ao duplicar mensagem:', error);
-      throw error;
-    }
+    });
   }
 
   // Buscar mensagens por personagem

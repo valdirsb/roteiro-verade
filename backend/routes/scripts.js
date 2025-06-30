@@ -333,29 +333,6 @@ router.post('/:id/messages/reorder', ScriptController.reorderMessages);
 
 /**
  * @swagger
- * /scripts/{id}/messages/{messageId}/duplicate:
- *   post:
- *     summary: Duplica uma mensagem em um roteiro
- *     tags: [Mensagens de Roteiro]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: integer }
- *       - in: path
- *         name: messageId
- *         required: true
- *         schema: { type: integer }
- *     responses:
- *       '201':
- *         description: Mensagem duplicada com sucesso
- */
-router.post('/:id/messages/:messageId/duplicate', ScriptController.duplicateMessage);
-
-/**
- * @swagger
  * /scripts/{id}/stats:
  *   get:
  *     summary: Obtém estatísticas de um roteiro específico

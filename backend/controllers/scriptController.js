@@ -522,7 +522,7 @@ class ScriptController {
   static async reorderMessages(req, res) {
     try {
       const { id } = req.params;
-      const { messageIds } = req.body;
+      const { messages } = req.body;
       
       const script = await Script.findById(parseInt(id));
       
@@ -541,6 +541,11 @@ class ScriptController {
           error: 'Sem permissão para editar este roteiro'
         });
       }
+
+      // Extrair IDs ordenados do array de mensagens
+      const messageIds = Array.isArray(messages)
+        ? messages.sort((a, b) => a.order - b.order).map(m => m.id)
+        : [];
 
       await ScriptMessage.reorderMessages(parseInt(id), messageIds);
 
@@ -552,49 +557,6 @@ class ScriptController {
       });
     } catch (error) {
       logger.error('Erro ao reordenar mensagens:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Erro interno no servidor'
-      });
-    }
-  }
-
-  // Duplicar mensagem
-  static async duplicateMessage(req, res) {
-    try {
-      const { id, messageId } = req.params;
-      
-      const script = await Script.findById(parseInt(id));
-      
-      if (!script) {
-        return res.status(404).json({
-          success: false,
-          error: 'Roteiro não encontrado'
-        });
-      }
-
-      // Verificar permissões
-      const permissions = await script.checkUserPermission(req.user.id);
-      if (!permissions.can_edit) {
-        return res.status(403).json({
-          success: false,
-          error: 'Sem permissão para editar este roteiro'
-        });
-      }
-
-      const duplicatedMessage = await ScriptMessage.duplicateMessage(parseInt(messageId));
-
-      logger.info(`Mensagem duplicada no roteiro ${id} por ${req.user.username}`);
-
-      res.json({
-        success: true,
-        message: 'Mensagem duplicada com sucesso',
-        data: {
-          message: duplicatedMessage.toResponseObject()
-        }
-      });
-    } catch (error) {
-      logger.error('Erro ao duplicar mensagem:', error);
       res.status(500).json({
         success: false,
         error: 'Erro interno no servidor'
@@ -656,8 +618,8 @@ class ScriptController {
       }
 
       const messages = await ScriptMessage.findByScript(parseInt(id), {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 10,
         character_id: character_id ? parseInt(character_id) : undefined,
         order_by,
         order_direction
