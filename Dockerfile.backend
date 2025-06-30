@@ -12,13 +12,13 @@ RUN apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Copiar package.json e package-lock.json
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Instalar dependências
 RUN npm ci --only=production && npm cache clean --force
 
 # Copiar código fonte
-COPY backend/ ./
+COPY . ./
 
 # Criar diretórios necessários
 RUN mkdir -p logs uploads

@@ -3,6 +3,24 @@
     <div class="dashboard__header">
       <h1 class="dashboard__title">Dashboard</h1>
       <p class="dashboard__subtitle">Bem-vindo ao Roteiro Verade</p>
+      <p v-if="lastUpdated" class="dashboard__last-updated">
+        Última atualização: {{ lastUpdated }}
+      </p>
+    </div>
+    
+    <!-- Indicador de loading -->
+    <div v-if="isLoading" class="dashboard__loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Carregando dados do dashboard...</p>
+    </div>
+
+    <!-- Indicador de erro -->
+    <div v-else-if="hasError" class="dashboard__error">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{ error?.message || 'Erro ao carregar dados do dashboard' }}</p>
+      <BaseButton variant="outline" @click="loadDashboardData">
+        Tentar Novamente
+      </BaseButton>
     </div>
     
     <div class="dashboard__content">
@@ -77,19 +95,19 @@
           >
             <div class="script-card__header">
               <h3 class="script-card__title">{{ script.title }}</h3>
-              <span class="script-card__status" :class="`script-card__status--${script.status}`">
-                {{ getStatusLabel(script.status) }}
+              <span class="script-card__status" :class="`script-card__status--${script.status || 'draft'}`">
+                {{ getStatusLabel(script.status || 'draft') }}
               </span>
             </div>
             <p class="script-card__description">{{ script.description }}</p>
             <div class="script-card__meta">
               <span class="script-card__date">
                 <i class="fas fa-calendar"></i>
-                {{ formatDate(script.updatedAt) }}
+                {{ formatDate(script.updatedAt || script.updated_at) }}
               </span>
               <span class="script-card__messages">
                 <i class="fas fa-comments"></i>
-                {{ script.messageCount }} mensagens
+                {{ script.messageCount || 0 }} mensagens
               </span>
             </div>
           </div>
@@ -112,22 +130,23 @@ export default {
 
   computed: {
     ...mapGetters({
-      scriptsCount: 'scripts/totalCount',
-      charactersCount: 'characters/totalCount',
-      recentScripts: 'scripts/recentScripts',
-      isAdmin: 'auth/isAdmin'
-    }),
-
-    sharesCount() {
-      // Implementar contagem de compartilhamentos
-      return 0
-    }
+      scriptsCount: 'stats/scriptsCount',
+      charactersCount: 'stats/charactersCount',
+      sharesCount: 'stats/sharesCount',
+      recentScripts: 'stats/recentScripts',
+      isAdmin: 'auth/isAdmin',
+      isLoading: 'stats/isLoading',
+      hasError: 'stats/hasError',
+      error: 'stats/error',
+      lastUpdated: 'stats/formattedLastUpdated'
+    })
   },
 
   methods: {
     ...mapActions({
       openModal: 'ui/openModal',
-      fetchRecentScripts: 'scripts/fetchRecentScripts'
+      loadDashboardData: 'stats/loadDashboardData',
+      loadAllStats: 'stats/loadAllStats'
     }),
 
     createScript() {
@@ -139,6 +158,11 @@ export default {
     },
 
     viewScript(scriptId) {
+      if (!scriptId) {
+        console.error('ID do script não fornecido')
+        return
+      }
+      console.log('Navegando para o script:', scriptId)
       this.$router.push(`/scripts/${scriptId}`)
     },
 
@@ -153,20 +177,39 @@ export default {
     },
 
     formatDate(date) {
+      if (!date) return 'Data não disponível'
       return new Date(date).toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric'
       })
+    },
+
+    async loadDashboardData() {
+      try {
+        console.log('Carregando dados do dashboard...')
+        
+        const result = await this.loadAllStats()
+        
+        if (result.success) {
+          console.log('Dados do dashboard carregados com sucesso')
+          
+          console.log('Scripts count:', this.scriptsCount)
+          console.log('Characters count:', this.charactersCount)
+          console.log('Shares count:', this.sharesCount)
+          console.log('Recent scripts:', this.recentScripts)
+          console.log('Last updated:', this.lastUpdated)
+        } else {
+          console.error('Erro ao carregar dados do dashboard:', result.error)
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do dashboard:', error)
+      }
     }
   },
 
   async mounted() {
-    try {
-      await this.fetchRecentScripts()
-    } catch (error) {
-      console.error('Erro ao carregar roteiros recentes:', error)
-    }
+    await this.loadDashboardData()
   }
 }
 </script>
@@ -203,6 +246,13 @@ export default {
   color: var(--text-secondary);
   margin: 0;
   font-weight: 400;
+}
+
+.dashboard__last-updated {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 8px 0 0 0;
+  font-style: italic;
 }
 
 .dashboard__stats {
@@ -567,5 +617,41 @@ export default {
 [data-theme="dark"] .script-card {
   background: var(--bg-secondary);
   border-color: var(--border-color);
+}
+
+.dashboard__loading,
+.dashboard__error {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-xl);
+  margin-bottom: 40px;
+}
+
+.dashboard__loading i,
+.dashboard__error i {
+  font-size: 2rem;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.dashboard__loading i {
+  color: var(--primary-color);
+}
+
+.dashboard__error i {
+  color: var(--error-color);
+}
+
+.dashboard__loading p,
+.dashboard__error p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+.dashboard__error p {
+  color: var(--error-color);
 }
 </style> 

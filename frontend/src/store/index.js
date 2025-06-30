@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import auth from './modules/auth';
 import characters from './modules/characters';
 import scripts from './modules/scripts';
+import stats from './modules/stats';
 import ui from './modules/ui';
 
 export default createStore({
@@ -105,6 +106,7 @@ export default createStore({
     auth,
     characters,
     scripts,
+    stats,
     ui
   }
 }); 

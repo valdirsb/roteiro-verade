@@ -5,6 +5,9 @@ const { authenticateToken } = require('../middleware/auth');
 const { requireRole } = require('../middleware/authorization');
 const { validateScript, validateMessage, validatePagination } = require('../utils/validation');
 
+// Rota para roteiros recentes (deve vir antes das rotas com parâmetros)
+router.get('/recent', ScriptController.getRecentScripts);
+
 // Rotas públicas (não requerem autenticação)
 router.get('/', validatePagination(), ScriptController.listScripts);
 router.get('/public', validatePagination(), ScriptController.listScripts);

@@ -357,9 +357,14 @@ export default {
       return [...state.defaultCharacters, ...state.characters];
     },
     
-    // Total de personagens
+    // Total de personagens (incluindo padrão e customizados)
     totalCharacters: (state) => {
-      return state.characters.length;
+      return state.characters.length + state.defaultCharacters.length;
+    },
+    
+    // Alias para totalCharacters (usado no Dashboard)
+    totalCount: (state) => {
+      return state.characters.length + state.defaultCharacters.length;
     },
     
     // Verificar se tem personagens

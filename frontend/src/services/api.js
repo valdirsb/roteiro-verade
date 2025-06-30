@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // Configuração base da API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// Se estiver rodando no Docker (porta 8081), usar proxy do nginx
+// Caso contrário, usar a URL direta do backend
+const isDockerEnvironment = window.location.port === '8081' || window.location.hostname === 'localhost' && window.location.port === '8081';
+const API_BASE_URL = isDockerEnvironment 
+  ? '/api' 
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
 
 // Criar instância do axios
 const api = axios.create({

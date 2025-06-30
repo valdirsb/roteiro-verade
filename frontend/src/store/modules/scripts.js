@@ -499,6 +499,30 @@ export default {
       }
     },
 
+    // Carregar roteiros que compartilhei
+    async loadMySharedScripts({ commit }) {
+      commit('SET_LOADING', true);
+      commit('CLEAR_ERROR');
+      
+      try {
+        const response = await scriptService.getMySharedScripts();
+        
+        if (response.success) {
+          commit('SET_MY_SHARED_SCRIPTS', response.data);
+          return { success: true };
+        } else {
+          commit('SET_ERROR', response.error);
+          return { success: false, error: response.error };
+        }
+      } catch {
+        const errorMessage = 'Erro ao carregar meus roteiros compartilhados.';
+        commit('SET_ERROR', { type: 'unknown', message: errorMessage });
+        return { success: false, error: { type: 'unknown', message: errorMessage } };
+      } finally {
+        commit('SET_LOADING', false);
+      }
+    },
+
     // Buscar roteiros
     async searchScripts({ commit, dispatch }, query) {
       commit('SET_FILTERS', { search: query, offset: 0 });
@@ -516,6 +540,37 @@ export default {
       const nextOffset = state.filters.offset + state.filters.limit;
       commit('SET_FILTERS', { offset: nextOffset });
       return await dispatch('loadScripts', { offset: nextOffset });
+    },
+
+    // Carregar roteiros recentes para o Dashboard
+    async fetchRecentScripts({ commit }) {
+      commit('SET_LOADING', true);
+      commit('CLEAR_ERROR');
+      
+      try {
+        const response = await scriptService.getRecentScripts(5);
+        
+        if (response.success) {
+          // Atualizar apenas os roteiros recentes no estado
+          const recentScripts = response.data.scripts || response.data;
+          commit('SET_SCRIPTS', recentScripts);
+          
+          if (response.data.pagination) {
+            commit('SET_PAGINATION', response.data.pagination);
+          }
+          
+          return { success: true };
+        } else {
+          commit('SET_ERROR', response.error);
+          return { success: false, error: response.error };
+        }
+      } catch {
+        const errorMessage = 'Erro ao carregar roteiros recentes.';
+        commit('SET_ERROR', { type: 'unknown', message: errorMessage });
+        return { success: false, error: { type: 'unknown', message: errorMessage } };
+      } finally {
+        commit('SET_LOADING', false);
+      }
     },
 
     // Limpar roteiros
@@ -569,6 +624,23 @@ export default {
     // Total de roteiros
     totalScripts: (state) => {
       return state.scripts.length;
+    },
+    
+    // Alias para totalScripts (usado no Dashboard)
+    totalCount: (state) => {
+      return state.scripts.length;
+    },
+    
+    // Roteiros recentes (últimos 5)
+    recentScripts: (state) => {
+      return [...state.scripts]
+        .sort((a, b) => new Date(b.updatedAt || b.updated_at) - new Date(a.updatedAt || a.updated_at))
+        .slice(0, 5);
+    },
+    
+    // Total de compartilhamentos (global)
+    totalShares: (state) => {
+      return state.scriptShares.length + state.sharedScripts.length + state.mySharedScripts.length;
     },
     
     // Verificar se tem roteiros

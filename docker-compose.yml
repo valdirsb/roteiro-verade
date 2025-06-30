@@ -27,8 +27,8 @@ services:
   # Backend Node.js
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.backend
+      context: ./backend
+      dockerfile: ../Dockerfile.backend
     container_name: roteiro-verade-backend
     restart: unless-stopped
     environment:
@@ -43,7 +43,7 @@ services:
       JWT_EXPIRES_IN: 24h
       JWT_REFRESH_SECRET: sua_chave_refresh_secreta_aqui_para_desenvolvimento
       JWT_REFRESH_EXPIRES_IN: 7d
-      CORS_ORIGIN: http://localhost:5173
+      CORS_ORIGIN: http://localhost:8081
       UPLOAD_PATH: ./uploads
       MAX_FILE_SIZE: 5242880
       LOG_LEVEL: info
@@ -69,7 +69,7 @@ services:
   # Frontend Vue.js
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.frontend
     container_name: roteiro-verade-frontend
     restart: unless-stopped

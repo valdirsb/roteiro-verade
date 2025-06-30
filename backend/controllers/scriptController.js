@@ -114,6 +114,86 @@ class ScriptController {
     }
   }
 
+  // Obter roteiros recentes
+  static async getRecentScripts(req, res) {
+    try {
+      const { limit = 5 } = req.query;
+      const userId = req.user?.id;
+      
+      logger.info('Obtendo roteiros recentes', {
+        service: 'roteiro-verade-backend',
+        userId: userId,
+        limit: parseInt(limit)
+      });
+
+      // Buscar roteiros recentes usando o método findAll do modelo
+      const filters = {
+        limit: parseInt(limit),
+        sort_by: 'updated_at',
+        sort_order: 'desc'
+      };
+
+      let formattedScripts = [];
+
+      if (userId) {
+        const [userScripts, publicScripts] = await Promise.all([
+          Script.findAll({ ...filters, created_by: userId }),
+          Script.findPublic(filters)
+        ]);
+        const allScripts = [
+          ...userScripts.scripts,
+          ...publicScripts.scripts
+        ].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+         .slice(0, parseInt(limit));
+        formattedScripts = allScripts.map(script => ({
+          id: script.id,
+          title: script.title,
+          description: script.description,
+          status: script.status || 'draft',
+          updatedAt: script.updated_at,
+          messageCount: script.message_count || 0
+        }));
+      } else {
+        const publicScripts = await Script.findPublic(filters);
+        formattedScripts = publicScripts.scripts.map(script => ({
+          id: script.id,
+          title: script.title,
+          description: script.description,
+          status: script.status || 'draft',
+          updatedAt: script.updated_at,
+          messageCount: script.message_count || 0
+        }));
+      }
+
+      // Sempre retornar sucesso, mesmo se não houver roteiros
+      if (!formattedScripts || formattedScripts.length === 0) {
+        return res.json({
+          success: true,
+          data: {
+            scripts: [],
+            total: 0,
+            limit: parseInt(limit)
+          }
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          scripts: formattedScripts,
+          total: formattedScripts.length,
+          limit: parseInt(limit)
+        }
+      });
+    } catch (error) {
+      logger.error('Erro ao obter roteiros recentes:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Erro interno no servidor'
+      });
+    }
+  }
+
   // Obter roteiro por ID
   static async getScript(req, res) {
     try {

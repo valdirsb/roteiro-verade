@@ -6,6 +6,7 @@ const authRoutes = require('./auth');
 const characterRoutes = require('./characters');
 const scriptRoutes = require('./scripts');
 const shareRoutes = require('./shares');
+const statsRoutes = require('./stats');
 
 // Rota de health check
 router.get('/health', (req, res) => {
@@ -27,7 +28,8 @@ router.get('/', (req, res) => {
       auth: '/api/auth',
       characters: '/api/characters',
       scripts: '/api/scripts',
-      shares: '/api/shares'
+      shares: '/api/shares',
+      stats: '/api/stats'
     }
   });
 });
@@ -37,5 +39,6 @@ router.use('/auth', authRoutes);
 router.use('/characters', characterRoutes);
 router.use('/scripts', scriptRoutes);
 router.use('/shares', shareRoutes);
+router.use('/stats', statsRoutes);
 
 module.exports = router; 
