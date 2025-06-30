@@ -273,73 +273,80 @@ class Character {
   // Buscar personagens com filtros
   static async findWithFilters(filters = {}) {
     try {
-      const { 
-        search, 
-        color, 
-        created_by, 
-        is_active, 
-        page = 1, 
-        limit = 10 
+      const {
+        search,
+        color,
+        created_by,
+        is_active,
+        page = 1,
+        limit = 10
       } = filters;
+
+      const offset = (parseInt(page, 10) - 1) * parseInt(limit, 10);
       
-      const offset = (page - 1) * limit;
-      
-      let sql = `
-        SELECT c.*, u.username as creator_name
-        FROM characters c
-        LEFT JOIN users u ON c.created_by = u.id
-        WHERE 1=1
-      `;
+      const whereClauses = [];
       const params = [];
 
       if (search) {
-        sql += ' AND c.name LIKE ?';
+        whereClauses.push('c.name LIKE ?');
         params.push(`%${search}%`);
       }
 
       if (color) {
-        sql += ' AND c.color = ?';
+        whereClauses.push('c.color = ?');
         params.push(color);
       }
 
       if (created_by) {
-        sql += ' AND c.created_by = ?';
+        whereClauses.push('c.created_by = ?');
         params.push(created_by);
       }
 
       if (is_active !== undefined && is_active !== null) {
-        sql += ' AND c.is_active = ?';
+        whereClauses.push('c.is_active = ?');
         params.push(is_active);
       }
+      
+      const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
 
-      // Debug: log dos filtros e parâmetros
-      logger.info('Filtros recebidos:', filters);
-      logger.info('Parâmetros da query:', JSON.stringify(params));
-      logger.info('SQL final:', sql);
-
-      // Contar total (usar cópia dos params, sem limit/offset)
-      const countSql = sql.replace('SELECT c.*, u.username as creator_name', 'SELECT COUNT(*) as total');
-      const countParams = [...params];
-      const countResult = await database.query(countSql, countParams);
+      // Contar total
+      const countSql = `
+        SELECT COUNT(*) as total
+        FROM characters c
+        ${whereSql}
+      `;
+      
+      const countResult = await database.query(countSql, params);
       const total = countResult[0].total;
-
+      
       // Buscar dados paginados
-      sql += ' ORDER BY c.name ASC LIMIT ? OFFSET ?';
-      const dataParams = [...params, parseInt(limit), parseInt(offset)];
-      const rows = await database.query(sql, dataParams);
+      const dataSql = `
+        SELECT c.*, u.username as creator_name
+        FROM characters c
+        LEFT JOIN users u ON c.created_by = u.id
+        ${whereSql}
+        ORDER BY c.name ASC
+        LIMIT ? OFFSET ?
+      `;
+
+      const dataParams = [...params, parseInt(limit, 10), offset];
+      const rows = await database.query(dataSql, dataParams);
       const characters = rows.map(row => new Character(row));
 
       return {
         characters,
         pagination: {
-          page: parseInt(page),
-          limit: parseInt(limit),
+          page: parseInt(page, 10),
+          limit: parseInt(limit, 10),
           total,
-          pages: Math.ceil(total / limit)
+          totalPages: Math.ceil(total / limit)
         }
       };
     } catch (error) {
-      logger.error('Erro ao buscar personagens com filtros:', error);
+      logger.error('Erro ao buscar personagens com filtros:', {
+        service: 'roteiro-verade-backend',
+        ...error
+      });
       throw error;
     }
   }

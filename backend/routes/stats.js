@@ -9,13 +9,29 @@ const User = require('../models/User');
 const database = require('../config/database');
 const logger = require('../utils/logger');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Estatísticas
+ *   description: Endpoints para obter estatísticas do sistema
+ */
+
 // Middleware de autenticação para todas as rotas
 router.use(authenticateToken);
 
 /**
- * @route   GET /api/stats
- * @desc    Obter estatísticas globais do sistema
- * @access  Private (Admin, Editor, Viewer)
+ * @swagger
+ * /stats:
+ *   get:
+ *     summary: Obter estatísticas globais do sistema
+ *     tags: [Estatísticas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Estatísticas globais agregadas
+ *       '500':
+ *         description: Erro no servidor
  */
 router.get('/', async (req, res) => {
   try {
@@ -125,9 +141,18 @@ router.get('/', async (req, res) => {
 });
 
 /**
- * @route   GET /api/stats/scripts
- * @desc    Obter estatísticas específicas de roteiros
- * @access  Private (Admin, Editor, Viewer)
+ * @swagger
+ * /stats/scripts:
+ *   get:
+ *     summary: Obter estatísticas específicas de roteiros
+ *     tags: [Estatísticas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Estatísticas detalhadas sobre roteiros
+ *       '500':
+ *         description: Erro no servidor
  */
 router.get('/scripts', async (req, res) => {
   try {
@@ -234,9 +259,18 @@ router.get('/scripts', async (req, res) => {
 });
 
 /**
- * @route   GET /api/stats/characters
- * @desc    Obter estatísticas de personagens
- * @access  Private (Admin, Editor, Viewer)
+ * @swagger
+ * /stats/characters:
+ *   get:
+ *     summary: Obter estatísticas de personagens
+ *     tags: [Estatísticas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Estatísticas detalhadas sobre personagens
+ *       '500':
+ *         description: Erro no servidor
  */
 router.get('/characters', async (req, res) => {
   try {
@@ -319,9 +353,18 @@ router.get('/characters', async (req, res) => {
 });
 
 /**
- * @route   GET /api/stats/shares
- * @desc    Obter estatísticas de compartilhamentos
- * @access  Private (Admin, Editor, Viewer)
+ * @swagger
+ * /stats/shares:
+ *   get:
+ *     summary: Obter estatísticas de compartilhamentos
+ *     tags: [Estatísticas]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Estatísticas detalhadas sobre compartilhamentos
+ *       '500':
+ *         description: Erro no servidor
  */
 router.get('/shares', async (req, res) => {
   try {

@@ -128,19 +128,55 @@ npm start
 - `DELETE /api/characters/:id` - Remover personagem (admin)
 
 ### Roteiros
-- `GET /api/scripts` - Listar roteiros
+- `GET /api/scripts` - Listar roteiros (paginado)
+- `GET /api/scripts/public` - Listar roteiros públicos
+- `GET /api/scripts/recent` - Listar roteiros recentes
+- `GET /api/scripts/user/scripts` - Listar roteiros do usuário
+- `GET /api/scripts/user/shared` - Listar roteiros compartilhados com o usuário
 - `GET /api/scripts/:id` - Obter roteiro
 - `POST /api/scripts` - Criar roteiro
 - `PUT /api/scripts/:id` - Atualizar roteiro
 - `DELETE /api/scripts/:id` - Remover roteiro
+- `GET /api/scripts/:id/export` - Exportar roteiro (PDF, TXT)
+- `GET /api/scripts/:id/stats` - Obter estatísticas de um roteiro
 
 ### Mensagens
+- `GET /api/scripts/:id/messages` - Listar mensagens de um roteiro
 - `POST /api/scripts/:id/messages` - Adicionar mensagem
 - `PUT /api/scripts/:id/messages/:messageId` - Editar mensagem
 - `DELETE /api/scripts/:id/messages/:messageId` - Remover mensagem
+- `POST /api/scripts/:id/messages/reorder` - Reordenar mensagens
+- `POST /api/scripts/:id/messages/:messageId/duplicate` - Duplicar mensagem
+
+### Compartilhamento (Shares)
+- `GET /api/shares/script/:id` - Listar compartilhamentos de um roteiro
+- `GET /api/shares/user` - Listar roteiros compartilhados com o usuário logado
+- `POST /api/shares/script/:id` - Compartilhar um roteiro com outro usuário
+- `PUT /api/shares/script/:id/:shareId` - Atualizar permissão de um compartilhamento
+- `DELETE /api/shares/script/:id/:shareId` - Remover um compartilhamento específico
+- `DELETE /api/shares/script/:id` - Remover todos os compartilhamentos de um roteiro
+- `GET /api/shares/users/search` - Buscar usuários para compartilhar
+- `GET /api/shares/script/:id/permissions` - Checar permissões do usuário em um roteiro
+- `GET /api/shares/stats` - Obter estatísticas de compartilhamento
+
+### Estatísticas (Stats)
+- `GET /api/stats` - Obter estatísticas globais do sistema
+- `GET /api/stats/scripts` - Obter estatísticas detalhadas sobre roteiros
+- `GET /api/stats/characters` - Obter estatísticas detalhadas sobre personagens
+- `GET /api/stats/shares` - Obter estatísticas detalhadas sobre compartilhamentos
 
 ### Utilitários
 - `GET /api/health` - Health check
+
+## 📖 API Documentation (Swagger)
+
+A documentação completa e interativa da API está disponível usando Swagger UI.
+
+Para acessar a documentação, inicie o servidor de desenvolvimento e acesse a seguinte URL no seu navegador:
+
+- **URL**: [http://localhost:3001/api-docs](http://localhost:3001/api-docs)
+
+A interface do Swagger permite visualizar todos os endpoints, seus parâmetros, schemas de resposta e testar as rotas diretamente do navegador.
 
 ## 🔐 Autenticação
 
@@ -222,15 +258,4 @@ npm start          # Iniciar em produção
 npm run dev        # Iniciar em desenvolvimento
 npm test           # Executar testes
 npm run lint       # Verificar código
-npm run lint:fix   # Corrigir código automaticamente
 ```
-
-## 📞 Suporte
-
-Para dúvidas ou problemas:
-- **Email**: suporte@mundoemverade.com
-- **Issues**: GitHub do projeto
-
----
-
-**Desenvolvido para o canal [Mundo em Verade](https://www.youtube.com/@mundo.em.verade)** 

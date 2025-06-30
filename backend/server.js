@@ -5,6 +5,8 @@ const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Importar middlewares e configurações
 const corsMiddleware = require('./middleware/cors');
@@ -67,6 +69,9 @@ app.use('/api', routes);
 
 // Middleware para servir arquivos de upload via API
 app.use('/api/uploads', serveStaticFiles);
+
+// Servir a documentação da API
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Rota para arquivos não encontrados
 app.use('*', (req, res) => {
