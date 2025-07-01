@@ -350,7 +350,6 @@ class Script {
         SELECT 
           s.*,
           u.username as creator_name,
-          ss.permission,
           COUNT(sm.id) as message_count,
           COUNT(DISTINCT sm.character_id) as character_count
         FROM scripts s
@@ -363,7 +362,7 @@ class Script {
       const params = [parseInt(userId)];
 
       // Contar total
-      const countSql = sql.replace('SELECT s.*, u.username as creator_name, ss.permission, COUNT(sm.id) as message_count, COUNT(DISTINCT sm.character_id) as character_count', 'SELECT COUNT(DISTINCT s.id) as total');
+      const countSql = sql.replace('SELECT s.*, u.username as creator_name, COUNT(sm.id) as message_count, COUNT(DISTINCT sm.character_id) as character_count', 'SELECT COUNT(DISTINCT s.id) as total');
       const countResult = await database.query(countSql, params);
       const total = parseInt(countResult[0].total) || 0;
 

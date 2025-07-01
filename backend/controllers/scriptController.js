@@ -15,7 +15,6 @@ class ScriptController {
         sort_order,
         type = 'all' // all, public, user, shared
       } = req.query;
-      
       const userId = req.user?.id;
       
       let result;
