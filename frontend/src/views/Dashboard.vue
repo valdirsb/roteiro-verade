@@ -7,7 +7,7 @@
         Última atualização: {{ lastUpdated }}
       </p>
     </div>
-    
+
     <!-- Indicador de loading -->
     <div v-if="isLoading" class="dashboard__loading">
       <i class="fas fa-spinner fa-spin"></i>
@@ -22,7 +22,7 @@
         Tentar Novamente
       </BaseButton>
     </div>
-    
+
     <div class="dashboard__content">
       <div class="dashboard__stats">
         <div class="stat-card">
@@ -34,7 +34,7 @@
             <div class="stat-card__label">Roteiros</div>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-card__icon">
             <i class="fas fa-users"></i>
@@ -44,7 +44,7 @@
             <div class="stat-card__label">Personagens</div>
           </div>
         </div>
-        
+
         <div class="stat-card">
           <div class="stat-card__icon">
             <i class="fas fa-share-alt"></i>
@@ -55,20 +55,20 @@
           </div>
         </div>
       </div>
-      
+
       <div class="dashboard__actions">
-        <BaseButton 
-          variant="primary" 
+        <BaseButton
+          variant="primary"
           size="large"
           icon="fa-plus"
           @click="createScript"
         >
           Criar Novo Roteiro
         </BaseButton>
-        
-        <BaseButton 
+
+        <BaseButton
           v-if="isAdmin"
-          variant="secondary" 
+          variant="secondary"
           size="large"
           icon="fa-user-plus"
           @click="createCharacter"
@@ -76,7 +76,7 @@
           Adicionar Personagem
         </BaseButton>
       </div>
-      
+
       <div class="dashboard__recent">
         <h2 class="dashboard__section-title">Roteiros Recentes</h2>
         <div v-if="recentScripts.length === 0" class="dashboard__empty">
@@ -87,8 +87,8 @@
           </BaseButton>
         </div>
         <div v-else class="dashboard__scripts">
-          <div 
-            v-for="script in recentScripts" 
+          <div
+            v-for="script in recentScripts"
             :key="script.id"
             class="script-card"
             @click="viewScript(script.id)"
@@ -123,7 +123,7 @@ import BaseButton from '@/components/ui/BaseButton.vue'
 
 export default {
   name: 'DashboardView',
-  
+
   components: {
     BaseButton
   },
@@ -186,14 +186,15 @@ export default {
     },
 
     async loadDashboardData() {
+
       try {
         console.log('Carregando dados do dashboard...')
-        
+
         const result = await this.loadAllStats()
-        
+
         if (result.success) {
           console.log('Dados do dashboard carregados com sucesso')
-          
+
           console.log('Scripts count:', this.scriptsCount)
           console.log('Characters count:', this.charactersCount)
           console.log('Shares count:', this.sharesCount)
@@ -499,61 +500,61 @@ export default {
     padding: 24px 16px;
     margin-bottom: 32px;
   }
-  
+
   .dashboard__title {
     font-size: 2rem;
   }
-  
+
   .dashboard__subtitle {
     font-size: 1.125rem;
   }
-  
+
   .dashboard__stats {
     grid-template-columns: 1fr;
     gap: 16px;
     margin-bottom: 32px;
   }
-  
+
   .stat-card {
     padding: 20px;
   }
-  
+
   .stat-card__icon {
     width: 50px;
     height: 50px;
     font-size: 1.25rem;
   }
-  
+
   .stat-card__value {
     font-size: 1.75rem;
   }
-  
+
   .dashboard__actions {
     flex-direction: column;
     align-items: stretch;
     gap: 12px;
     margin-bottom: 32px;
   }
-  
+
   .dashboard__recent {
     padding: 24px 16px;
   }
-  
+
   .dashboard__scripts {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
+
   .script-card {
     padding: 20px;
   }
-  
+
   .script-card__header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .script-card__meta {
     flex-direction: column;
     gap: 8px;
@@ -654,4 +655,4 @@ export default {
 .dashboard__error p {
   color: var(--error-color);
 }
-</style> 
+</style>

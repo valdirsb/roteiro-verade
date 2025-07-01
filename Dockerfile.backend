@@ -11,14 +11,17 @@ RUN apk add --no-cache \
     g++ \
     && rm -rf /var/cache/apk/*
 
-# Copiar package.json e package-lock.json
+# Copiar package.json e package-lock.json da raiz (workspace)
 COPY package*.json ./
 
-# Instalar dependências
-RUN npm ci --only=production && npm cache clean --force
+# Copiar package.json do backend
+COPY backend/package.json ./backend/
 
-# Copiar código fonte
-COPY . ./
+# Instalar dependências do workspace
+RUN npm ci --only=production --workspace=backend && npm cache clean --force
+
+# Copiar código fonte do backend
+COPY backend/ ./
 
 # Criar diretórios necessários
 RUN mkdir -p logs uploads

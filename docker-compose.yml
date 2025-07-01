@@ -27,8 +27,8 @@ services:
   # Backend Node.js
   backend:
     build:
-      context: ./backend
-      dockerfile: ../Dockerfile.backend
+      context: .
+      dockerfile: Dockerfile.backend
     container_name: roteiro-verade-backend
     restart: unless-stopped
     environment:

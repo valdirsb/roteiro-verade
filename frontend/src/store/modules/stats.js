@@ -2,7 +2,7 @@ import statsService from '@/services/statsService';
 
 export default {
   namespaced: true,
-  
+
   state: {
     globalStats: null,
     scriptStats: null,
@@ -18,39 +18,39 @@ export default {
     SET_GLOBAL_STATS(state, stats) {
       state.globalStats = stats;
     },
-    
+
     SET_SCRIPT_STATS(state, stats) {
       state.scriptStats = stats;
     },
-    
+
     SET_CHARACTER_STATS(state, stats) {
       state.characterStats = stats;
     },
-    
+
     SET_SHARE_STATS(state, stats) {
       state.shareStats = stats;
     },
-    
+
     SET_RECENT_SCRIPTS(state, scripts) {
       state.recentScripts = scripts;
     },
-    
+
     SET_LOADING(state, loading) {
       state.isLoading = loading;
     },
-    
+
     SET_ERROR(state, error) {
       state.error = error;
     },
-    
+
     CLEAR_ERROR(state) {
       state.error = null;
     },
-    
+
     SET_LAST_UPDATED(state, timestamp) {
       state.lastUpdated = timestamp;
     },
-    
+
     CLEAR_STATS(state) {
       state.globalStats = null;
       state.scriptStats = null;
@@ -67,10 +67,10 @@ export default {
     async loadGlobalStats({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getGlobalStats();
-        
+
         if (response.success) {
           commit('SET_GLOBAL_STATS', response.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -92,10 +92,10 @@ export default {
     async loadScriptStats({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getScriptStats();
-        
+
         if (response.success) {
           commit('SET_SCRIPT_STATS', response.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -117,10 +117,10 @@ export default {
     async loadCharacterStats({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getCharacterStats();
-        
+
         if (response.success) {
           commit('SET_CHARACTER_STATS', response.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -142,10 +142,10 @@ export default {
     async loadShareStats({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getShareStats();
-        
+
         if (response.success) {
           commit('SET_SHARE_STATS', response.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -167,10 +167,10 @@ export default {
     async loadRecentScripts({ commit }, limit = 5) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getRecentScripts(limit);
-        
+
         if (response.success) {
           commit('SET_RECENT_SCRIPTS', response.data.scripts);
           commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -192,10 +192,10 @@ export default {
     async loadDashboardData({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await statsService.getDashboardData();
-        
+
         if (response.success) {
           if (response.data.stats) {
             commit('SET_GLOBAL_STATS', response.data.stats);
@@ -222,7 +222,7 @@ export default {
     async loadAllStats({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const [globalStats, scriptStats, characterStats, shareStats, recentScripts] = await Promise.all([
           statsService.getGlobalStats(),
@@ -280,48 +280,48 @@ export default {
     error: state => state.error,
     hasError: state => !!state.error,
     lastUpdated: state => state.lastUpdated,
-    
+
     // Contadores do dashboard
     scriptsCount: (state) => {
       return state.globalStats?.total?.scripts || 0;
     },
-    
+
     charactersCount: (state) => {
       return state.globalStats?.total?.characters || 0;
     },
-    
+
     sharesCount: (state) => {
       return state.globalStats?.total?.shares || 0;
     },
-    
+
     usersCount: (state) => {
       return state.globalStats?.total?.users || 0;
     },
-    
+
     // Roteiros por status
     scriptsByStatus: (state) => {
       return state.globalStats?.scripts?.byStatus || [];
     },
-    
+
     // Atividade recente
     recentActivity: (state) => {
       return state.globalStats?.scripts?.recentActivity || 0;
     },
-    
+
     // Verificar se tem dados
     hasStats: (state) => {
       return !!state.globalStats;
     },
-    
+
     // Verificar se tem roteiros recentes
     hasRecentScripts: (state) => {
       return state.recentScripts.length > 0;
     },
-    
+
     // Formatar última atualização
     formattedLastUpdated: (state) => {
       if (!state.lastUpdated) return null;
       return new Date(state.lastUpdated).toLocaleString('pt-BR');
     }
   }
-}; 
+};
