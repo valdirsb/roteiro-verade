@@ -1,97 +1,97 @@
 <template>
-  <aside 
+  <aside
     class="app-sidebar"
     :class="{ 'app-sidebar--open': sidebarOpen }"
   >
     <div class="app-sidebar__overlay" @click="closeSidebar"></div>
-    
+
     <div class="app-sidebar__content">
       <div class="app-sidebar__header">
         <div class="app-sidebar__brand">
           <img src="/favicon.ico" alt="Logo" class="app-sidebar__logo" />
           <h2 class="app-sidebar__title">Roteiro Verade</h2>
         </div>
-        <button 
+        <button
           class="app-sidebar__close"
           @click="closeSidebar"
           aria-label="Fechar menu"
         >
-          <i class="fas fa-times"></i>
+          <i class="fas fa-xmark"></i>
         </button>
       </div>
-      
+
       <nav class="app-sidebar__nav">
         <div class="app-sidebar__section">
           <h3 class="app-sidebar__section-title">Principal</h3>
-          
-          <router-link 
-            to="/dashboard" 
+
+          <router-link
+            to="/dashboard"
             class="app-sidebar__item"
             active-class="app-sidebar__item--active"
           >
-            <i class="fas fa-tachometer-alt"></i>
+            <i class="fas fa-gauge"></i>
             <span>Dashboard</span>
           </router-link>
-          
-          <router-link 
-            to="/scripts" 
+
+          <router-link
+            to="/scripts"
             class="app-sidebar__item"
             active-class="app-sidebar__item--active"
           >
-            <i class="fas fa-file-alt"></i>
+            <i class="fas fa-file-lines"></i>
             <span>Roteiros</span>
             <span v-if="scriptsCount > 0" class="app-sidebar__badge">
               {{ scriptsCount > 99 ? '99+' : scriptsCount }}
             </span>
           </router-link>
-          
-          <router-link 
-            to="/characters" 
+
+          <router-link
+            to="/characters"
             class="app-sidebar__item"
             active-class="app-sidebar__item--active"
           >
-            <i class="fas fa-users"></i>
+            <i class="fas fa-user-group"></i>
             <span>Personagens</span>
             <span v-if="charactersCount > 0" class="app-sidebar__badge">
               {{ charactersCount > 99 ? '99+' : charactersCount }}
             </span>
           </router-link>
         </div>
-        
+
         <div v-if="isAdmin" class="app-sidebar__section">
           <h3 class="app-sidebar__section-title">Administração</h3>
-          
-          <router-link 
-            to="/users" 
+
+          <router-link
+            to="/users"
             class="app-sidebar__item"
             active-class="app-sidebar__item--active"
           >
-            <i class="fas fa-user-cog"></i>
+            <i class="fas fa-user-gear"></i>
             <span>Usuários</span>
           </router-link>
-          
-          <router-link 
-            to="/settings" 
+
+          <router-link
+            to="/settings"
             class="app-sidebar__item"
             active-class="app-sidebar__item--active"
           >
-            <i class="fas fa-cog"></i>
+            <i class="fas fa-gear"></i>
             <span>Configurações</span>
           </router-link>
         </div>
-        
+
         <div class="app-sidebar__section">
           <h3 class="app-sidebar__section-title">Ações Rápidas</h3>
-          
-          <button 
+
+          <button
             class="app-sidebar__item app-sidebar__item--action"
             @click="createScript"
           >
             <i class="fas fa-plus"></i>
             <span>Novo Roteiro</span>
           </button>
-          
-          <button 
+
+          <button
             v-if="isAdmin"
             class="app-sidebar__item app-sidebar__item--action"
             @click="createCharacter"
@@ -101,12 +101,12 @@
           </button>
         </div>
       </nav>
-      
+
       <div class="app-sidebar__footer">
         <div class="app-sidebar__user">
-          <img 
-            v-if="userAvatar" 
-            :src="userAvatar" 
+          <img
+            v-if="userAvatar"
+            :src="userAvatar"
             :alt="userName"
             class="app-sidebar__user-avatar"
           />
@@ -118,13 +118,13 @@
             <div class="app-sidebar__user-role">{{ userRole }}</div>
           </div>
         </div>
-        
-        <button 
+
+        <button
           class="app-sidebar__logout"
           @click="handleLogout"
           title="Sair"
         >
-          <i class="fas fa-sign-out-alt"></i>
+                      <i class="fas fa-right-from-bracket"></i>
         </button>
       </div>
     </div>
@@ -136,7 +136,7 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'AppSidebar',
-  
+
   computed: {
     ...mapGetters({
       sidebarOpen: 'ui/sidebarOpen',
@@ -428,11 +428,11 @@ export default {
     width: 280px;
     flex-shrink: 0;
   }
-  
+
   .app-sidebar__overlay {
     display: none;
   }
-  
+
   .app-sidebar__close {
     display: none;
   }
@@ -450,20 +450,20 @@ export default {
   .app-sidebar {
     width: 100%;
   }
-  
+
   .app-sidebar__header {
     padding: 16px 20px;
   }
-  
+
   .app-sidebar__nav {
     padding: 16px 0;
   }
-  
+
   .app-sidebar__item {
     padding: 16px 20px;
     font-size: 1rem;
   }
-  
+
   .app-sidebar__footer {
     padding: 16px 20px;
   }
@@ -473,4 +473,4 @@ export default {
 [data-theme="dark"] .app-sidebar {
   border-right-color: var(--border-color);
 }
-</style> 
+</style>

@@ -16,7 +16,7 @@
 
     <!-- Indicador de erro -->
     <div v-else-if="hasError" class="dashboard__error">
-      <i class="fas fa-exclamation-triangle"></i>
+      <i class="fas fa-triangle-exclamation"></i>
       <p>{{ error?.message || 'Erro ao carregar dados do dashboard' }}</p>
       <BaseButton variant="outline" @click="loadDashboardData">
         Tentar Novamente
@@ -27,7 +27,7 @@
       <div class="dashboard__stats">
         <div class="stat-card">
           <div class="stat-card__icon">
-            <i class="fas fa-file-alt"></i>
+            <i class="fas fa-file-lines"></i>
           </div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ scriptsCount }}</div>
@@ -37,7 +37,7 @@
 
         <div class="stat-card">
           <div class="stat-card__icon">
-            <i class="fas fa-users"></i>
+            <i class="fas fa-user-group"></i>
           </div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ charactersCount }}</div>
@@ -47,7 +47,7 @@
 
         <div class="stat-card">
           <div class="stat-card__icon">
-            <i class="fas fa-share-alt"></i>
+            <i class="fas fa-share"></i>
           </div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ sharesCount }}</div>
@@ -80,7 +80,7 @@
       <div class="dashboard__recent">
         <h2 class="dashboard__section-title">Roteiros Recentes</h2>
         <div v-if="!recentScripts || recentScripts.length === 0" class="dashboard__empty">
-          <i class="fas fa-file-alt"></i>
+          <i class="fas fa-file-lines"></i>
           <p>Nenhum roteiro criado ainda</p>
           <BaseButton variant="outline" @click="createScript">
             Criar Primeiro Roteiro

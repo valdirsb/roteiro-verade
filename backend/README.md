@@ -119,6 +119,7 @@ npm start
 - `POST /api/auth/register` - Registro
 - `POST /api/auth/logout` - Logout
 - `POST /api/auth/refresh` - Refresh token
+- `GET /api/auth/verify` - Verifica a validade do token de acesso e retorna os dados do usuário autenticado
 
 ### Personagens
 - `GET /api/characters` - Listar personagens
@@ -182,6 +183,10 @@ A interface do Swagger permite visualizar todos os endpoints, seus parâmetros, 
 ## 🔐 Autenticação
 
 O sistema usa JWT (JSON Web Tokens) para autenticação.
+
+- Para verificar se um token de acesso ainda é válido, utilize o endpoint:
+  - `GET /api/auth/verify` (requer header Authorization: Bearer <token>)
+  - Retorna os dados do usuário autenticado se o token for válido, ou erro 401 se inválido/expirado.
 
 ### Headers Necessários
 ```

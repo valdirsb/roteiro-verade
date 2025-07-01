@@ -1,37 +1,37 @@
 <template>
   <header class="app-header">
     <div class="app-header__left">
-      <button 
+      <button
         class="app-header__menu-toggle"
         @click="toggleSidebar"
         aria-label="Toggle menu"
       >
         <i class="fas fa-bars"></i>
       </button>
-      
+
       <div class="app-header__brand">
         <img src="/favicon.ico" alt="Logo" class="app-header__logo" />
         <h1 class="app-header__title">Roteiro Verade</h1>
       </div>
     </div>
-    
+
     <div class="app-header__center">
       <div class="app-header__search">
         <BaseInput
           v-model="searchQuery"
           type="search"
           placeholder="Buscar roteiros, personagens..."
-          icon="fa-search"
+                      icon="fa-magnifying-glass"
           clearable
           @input="handleSearch"
           @clear="clearSearch"
         />
       </div>
     </div>
-    
+
     <div class="app-header__right">
       <!-- Notificações -->
-      <button 
+      <button
         class="app-header__action"
         @click="toggleNotifications"
         :class="{ 'app-header__action--active': showNotifications }"
@@ -42,9 +42,9 @@
           {{ notificationCount > 99 ? '99+' : notificationCount }}
         </span>
       </button>
-      
+
       <!-- Tema -->
-      <button 
+      <button
         class="app-header__theme-toggle"
         @click="toggleTheme"
         :title="theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
@@ -53,18 +53,18 @@
         <i :class="themeIcon"></i>
         <span class="app-header__theme-text">{{ theme === 'dark' ? 'Claro' : 'Escuro' }}</span>
       </button>
-      
+
       <!-- Menu do usuário -->
       <div class="app-header__user-menu">
-        <button 
+        <button
           class="app-header__user-toggle"
           @click="toggleUserMenu"
           :class="{ 'app-header__user-toggle--active': showUserMenu }"
           aria-label="Menu do usuário"
         >
-          <img 
-            v-if="userAvatar" 
-            :src="userAvatar" 
+          <img
+            v-if="userAvatar"
+            :src="userAvatar"
             :alt="userName"
             class="app-header__avatar"
           />
@@ -74,14 +74,14 @@
           <span class="app-header__user-name">{{ userName }}</span>
           <i class="fas fa-chevron-down"></i>
         </button>
-        
+
         <Transition name="dropdown">
           <div v-if="showUserMenu" class="app-header__dropdown">
             <div class="app-header__dropdown-header">
               <div class="app-header__dropdown-user">
-                <img 
-                  v-if="userAvatar" 
-                  :src="userAvatar" 
+                <img
+                  v-if="userAvatar"
+                  :src="userAvatar"
                   :alt="userName"
                   class="app-header__dropdown-avatar"
                 />
@@ -95,33 +95,33 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="app-header__dropdown-menu">
-              <router-link 
-                to="/profile" 
+              <router-link
+                to="/profile"
                 class="app-header__dropdown-item"
                 @click="closeUserMenu"
               >
                 <i class="fas fa-user"></i>
                 <span>Perfil</span>
               </router-link>
-              
-              <router-link 
-                to="/settings" 
+
+              <router-link
+                to="/settings"
                 class="app-header__dropdown-item"
                 @click="closeUserMenu"
               >
-                <i class="fas fa-cog"></i>
+                <i class="fas fa-gear"></i>
                 <span>Configurações</span>
               </router-link>
-              
+
               <div class="app-header__dropdown-divider"></div>
-              
-              <button 
+
+              <button
                 class="app-header__dropdown-item app-header__dropdown-item--danger"
                 @click="handleLogout"
               >
-                <i class="fas fa-sign-out-alt"></i>
+                <i class="fas fa-right-from-bracket"></i>
                 <span>Sair</span>
               </button>
             </div>
@@ -138,7 +138,7 @@ import BaseInput from '@/components/ui/BaseInput.vue'
 
 export default {
   name: 'AppHeader',
-  
+
   components: {
     BaseInput
   },
@@ -513,15 +513,15 @@ export default {
   .app-header {
     padding: 0 16px;
   }
-  
+
   .app-header__center {
     display: none;
   }
-  
+
   .app-header__user-name {
     display: none;
   }
-  
+
   .app-header__title {
     font-size: 1.1rem;
   }
@@ -532,7 +532,7 @@ export default {
     padding: 6px;
     font-size: 1rem;
   }
-  
+
   .app-header__user-toggle {
     padding: 6px 8px;
   }
@@ -579,13 +579,13 @@ export default {
     padding: 6px 8px;
     font-size: 0.75rem;
   }
-  
+
   .app-header__theme-text {
     display: none;
   }
-  
+
   .app-header__theme-toggle i {
     font-size: 1.1rem;
   }
 }
-</style> 
+</style>

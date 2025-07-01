@@ -2,19 +2,19 @@
   <div class="base-modal">
     <div class="base-modal__header">
       <h2 class="base-modal__title">{{ title }}</h2>
-      <button 
+      <button
         class="base-modal__close"
         @click="$emit('close')"
         aria-label="Fechar modal"
       >
-        <i class="fas fa-times"></i>
+        <i class="fas fa-xmark"></i>
       </button>
     </div>
-    
+
     <div class="base-modal__body">
       <slot />
     </div>
-    
+
     <div v-if="$slots.footer" class="base-modal__footer">
       <slot name="footer" />
     </div>
@@ -24,7 +24,7 @@
 <script>
 export default {
   name: 'BaseModal',
-  
+
   props: {
     title: {
       type: String,
@@ -103,20 +103,20 @@ export default {
     width: 100%;
     max-height: 90vh;
   }
-  
+
   .base-modal__header {
     padding: 16px 20px;
   }
-  
+
   .base-modal__body {
     padding: 20px;
   }
-  
+
   .base-modal__footer {
     padding: 16px 20px;
     flex-direction: column;
   }
-  
+
   .base-modal__footer > * {
     width: 100%;
   }
@@ -126,4 +126,4 @@ export default {
 [data-theme="dark"] .base-modal {
   border: 1px solid var(--border-color);
 }
-</style> 
+</style>

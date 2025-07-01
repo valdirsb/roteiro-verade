@@ -154,4 +154,39 @@ router.post('/logout', authenticateToken, AuthController.logout);
  */
 router.post('/refresh', AuthController.refresh);
 
+/**
+ * @swagger
+ * /auth/verify:
+ *   get:
+ *     summary: Verifica a validade do token de acesso
+ *     tags: [Autenticação]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Token válido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       '401':
+ *         description: Token inválido ou expirado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+// Verificar validade do token de acesso
+router.get('/verify', authenticateToken, (req, res) => {
+  res.json({ success: true, data: { user: req.user } });
+});
+
 module.exports = router;

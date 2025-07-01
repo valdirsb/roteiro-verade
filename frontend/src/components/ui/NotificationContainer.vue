@@ -1,8 +1,8 @@
 <template>
   <div class="notification-container">
-    <TransitionGroup 
-      name="notification" 
-      tag="div" 
+    <TransitionGroup
+      name="notification"
+      tag="div"
       class="notifications-wrapper"
     >
       <div
@@ -18,24 +18,24 @@
         <div class="notification__icon">
           <i :class="getIconClass(notification.icon, notification.type)"></i>
         </div>
-        
+
         <div class="notification__content">
           <div class="notification__message">
             {{ notification.message }}
           </div>
-          
+
           <div v-if="notification.details" class="notification__details">
             {{ notification.details }}
           </div>
         </div>
-        
-        <button 
+
+        <button
           v-if="notification.closable !== false"
           class="notification__close"
           @click.stop="removeNotification(notification.id)"
           aria-label="Fechar notificação"
         >
-          <i class="fas fa-times"></i>
+                      <i class="fas fa-xmark"></i>
         </button>
       </div>
     </TransitionGroup>
@@ -47,7 +47,7 @@ import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'NotificationContainer',
-  
+
   computed: {
     ...mapGetters({
       notifications: 'ui/notifications'
@@ -63,15 +63,15 @@ export default {
       if (icon) {
         return icon.startsWith('fas ') ? icon : `fas ${icon}`
       }
-      
+
       // Ícones padrão por tipo
       const defaultIcons = {
-        success: 'fas fa-check-circle',
-        error: 'fas fa-exclamation-circle',
-        warning: 'fas fa-exclamation-triangle',
-        info: 'fas fa-info-circle'
+        success: 'fas fa-circle-check',
+        error: 'fas fa-circle-exclamation',
+        warning: 'fas fa-triangle-exclamation',
+        info: 'fas fa-circle-info'
       }
-      
+
       return defaultIcons[type] || 'fas fa-bell'
     }
   }
@@ -202,11 +202,11 @@ export default {
     right: 10px;
     left: 10px;
   }
-  
+
   .notifications-wrapper {
     max-width: none;
   }
-  
+
   .notification {
     min-width: auto;
     max-width: none;
@@ -222,4 +222,4 @@ export default {
 [data-theme="dark"] .notification:hover {
   background: var(--bg-tertiary);
 }
-</style> 
+</style>

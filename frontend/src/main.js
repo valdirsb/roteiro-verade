@@ -11,6 +11,10 @@ const app = createApp(App)
 app.use(store)
 app.use(router)
 
+// Inicializar autenticação
+await store.dispatch('auth/initAuth')
+await store.dispatch('auth/checkAuth')
+
 // Montar aplicação
 app.mount('#app')
 

@@ -4,10 +4,10 @@
       {{ label }}
       <span v-if="required" class="input__required">*</span>
     </label>
-    
+
     <div class="input__container">
       <i v-if="icon" :class="iconClass" class="input__icon"></i>
-      
+
       <input
         :id="id"
         :type="type"
@@ -26,11 +26,11 @@
         @blur="handleBlur"
         @keydown="handleKeydown"
       />
-      
+
       <i v-if="loading" class="fas fa-spinner fa-spin input__loading"></i>
-      <i v-else-if="clearable && modelValue" class="fas fa-times input__clear" @click="clearInput"></i>
+              <i v-else-if="clearable && modelValue" class="fas fa-xmark input__clear" @click="clearInput"></i>
     </div>
-    
+
     <div v-if="error || hint" class="input__message">
       <span v-if="error" class="input__error">{{ error }}</span>
       <span v-else-if="hint" class="input__hint">{{ hint }}</span>
@@ -41,7 +41,7 @@
 <script>
 export default {
   name: 'BaseInput',
-  
+
   props: {
     modelValue: {
       type: [String, Number],
@@ -304,7 +304,7 @@ export default {
     font-size: 0.875rem;
     min-height: 40px;
   }
-  
+
   .input--large {
     padding: 14px 18px;
     font-size: 1rem;
@@ -321,4 +321,4 @@ export default {
 [data-theme="dark"] .input:focus {
   background: var(--bg-primary);
 }
-</style> 
+</style>
