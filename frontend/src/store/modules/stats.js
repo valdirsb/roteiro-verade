@@ -72,7 +72,7 @@ export default {
         const response = await statsService.getGlobalStats();
 
         if (response.success) {
-          commit('SET_GLOBAL_STATS', response.data);
+          commit('SET_GLOBAL_STATS', response.data.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
           return { success: true };
         } else {
@@ -97,7 +97,7 @@ export default {
         const response = await statsService.getScriptStats();
 
         if (response.success) {
-          commit('SET_SCRIPT_STATS', response.data);
+          commit('SET_SCRIPT_STATS', response.data.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
           return { success: true };
         } else {
@@ -122,7 +122,7 @@ export default {
         const response = await statsService.getCharacterStats();
 
         if (response.success) {
-          commit('SET_CHARACTER_STATS', response.data);
+          commit('SET_CHARACTER_STATS', response.data.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
           return { success: true };
         } else {
@@ -147,7 +147,7 @@ export default {
         const response = await statsService.getShareStats();
 
         if (response.success) {
-          commit('SET_SHARE_STATS', response.data);
+          commit('SET_SHARE_STATS', response.data.data);
           commit('SET_LAST_UPDATED', new Date().toISOString());
           return { success: true };
         } else {
@@ -172,7 +172,7 @@ export default {
         const response = await statsService.getRecentScripts(limit);
 
         if (response.success) {
-          commit('SET_RECENT_SCRIPTS', response.data.scripts);
+          commit('SET_RECENT_SCRIPTS', response.data.data.scripts);
           commit('SET_LAST_UPDATED', new Date().toISOString());
           return { success: true };
         } else {
@@ -198,7 +198,7 @@ export default {
 
         if (response.success) {
           if (response.data.stats) {
-            commit('SET_GLOBAL_STATS', response.data.stats);
+            commit('SET_GLOBAL_STATS', response.data.data.stats);
           }
           if (response.data.recentScripts) {
             commit('SET_RECENT_SCRIPTS', response.data.recentScripts);
@@ -233,19 +233,19 @@ export default {
         ]);
 
         if (globalStats.success) {
-          commit('SET_GLOBAL_STATS', globalStats.data);
+          commit('SET_GLOBAL_STATS', globalStats.data.data);
         }
         if (scriptStats.success) {
-          commit('SET_SCRIPT_STATS', scriptStats.data);
+          commit('SET_SCRIPT_STATS', scriptStats.data.data);
         }
         if (characterStats.success) {
-          commit('SET_CHARACTER_STATS', characterStats.data);
+          commit('SET_CHARACTER_STATS', characterStats.data.data);
         }
         if (shareStats.success) {
-          commit('SET_SHARE_STATS', shareStats.data);
+          commit('SET_SHARE_STATS', shareStats.data.data);
         }
         if (recentScripts.success) {
-          commit('SET_RECENT_SCRIPTS', recentScripts.data.scripts);
+          commit('SET_RECENT_SCRIPTS', recentScripts.data.data.scripts);
         }
 
         commit('SET_LAST_UPDATED', new Date().toISOString());
@@ -283,7 +283,8 @@ export default {
 
     // Contadores do dashboard
     scriptsCount: (state) => {
-      return state.globalStats?.total?.scripts || 0;
+      const value = state.globalStats?.total?.scripts || 0;
+      return value;
     },
 
     charactersCount: (state) => {

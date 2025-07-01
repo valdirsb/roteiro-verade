@@ -79,7 +79,7 @@
 
       <div class="dashboard__recent">
         <h2 class="dashboard__section-title">Roteiros Recentes</h2>
-        <div v-if="recentScripts.length === 0" class="dashboard__empty">
+        <div v-if="!recentScripts || recentScripts.length === 0" class="dashboard__empty">
           <i class="fas fa-file-alt"></i>
           <p>Nenhum roteiro criado ainda</p>
           <BaseButton variant="outline" @click="createScript">
