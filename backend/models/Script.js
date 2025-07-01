@@ -69,7 +69,7 @@ class Script {
       const safePage = Math.max(1, parseInt(page) || 1);
       const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 10)); // Máximo 100 por página
       const safeOffset = (safePage - 1) * safeLimit;
-      
+
       // Debug: log dos valores
       console.log('DEBUG - Valores recebidos:', {
         search,
@@ -80,13 +80,46 @@ class Script {
         sort_by,
         sort_order
       });
-      
+
       console.log('DEBUG - Valores processados:', {
         safePage,
         safeLimit,
         safeOffset
       });
-      
+
+      // Montar filtros SQL
+      let whereSql = 'WHERE 1=1';
+      const params = [];
+      const countParams = [];
+
+      if (search) {
+        whereSql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`);
+        countParams.push(`%${search}%`, `%${search}%`);
+      }
+
+      if (is_public !== undefined && is_public !== null) {
+        whereSql += ' AND s.is_public = ?';
+        const intValue = is_public ? 1 : 0;
+        params.push(intValue);
+        countParams.push(intValue);
+        console.log('DEBUG - is_public value:', is_public, 'convertido para inteiro:', intValue);
+      }
+
+      if (created_by) {
+        whereSql += ' AND s.created_by = ?';
+        const userId = parseInt(created_by);
+        params.push(userId);
+        countParams.push(userId);
+        console.log('DEBUG - created_by value:', created_by, 'converted to:', userId);
+      }
+
+      // Query de contagem (sem GROUP BY, sem joins desnecessários)
+      const countSql = `SELECT COUNT(DISTINCT s.id) as total FROM scripts s ${whereSql}`;
+      const countResult = await database.query(countSql, countParams);
+      const total = parseInt(countResult[0]?.total) || 0;
+
+      // Query de listagem
       let sql = `
         SELECT 
           s.*,
@@ -96,43 +129,15 @@ class Script {
         FROM scripts s
         LEFT JOIN users u ON s.created_by = u.id
         LEFT JOIN script_messages sm ON s.id = sm.script_id
-        WHERE 1=1
+        ${whereSql}
+        GROUP BY s.id
       `;
-      const params = [];
-
-      if (search) {
-        sql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
-        params.push(`%${search}%`, `%${search}%`);
-      }
-
-      if (is_public !== undefined && is_public !== null) {
-        sql += ' AND s.is_public = ?';
-        const intValue = is_public ? 1 : 0;
-        params.push(intValue);
-        console.log('DEBUG - is_public value:', is_public, 'convertido para inteiro:', intValue);
-      }
-
-      if (created_by) {
-        sql += ' AND s.created_by = ?';
-        const userId = parseInt(created_by);
-        params.push(userId);
-        console.log('DEBUG - created_by value:', created_by, 'converted to:', userId);
-      }
-
-      sql += ' GROUP BY s.id';
-
-      // Contar total
-      const countSql = sql.replace('SELECT s.*, u.username as creator_name, COUNT(sm.id) as message_count, COUNT(DISTINCT sm.character_id) as character_count', 'SELECT COUNT(DISTINCT s.id) as total');
-      const countResult = await database.query(countSql, params);
-      const total = parseInt(countResult[0].total) || 0;
 
       // Ordenação
       const allowedSortFields = ['title', 'created_at', 'updated_at', 'message_count'];
       const allowedSortOrders = ['asc', 'desc'];
-      
       const sortField = allowedSortFields.includes(sort_by) ? sort_by : 'created_at';
       const sortOrder = allowedSortOrders.includes(sort_order) ? sort_order : 'desc';
-      
       sql += ` ORDER BY ${sortField} ${sortOrder.toUpperCase()} LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
       console.log('DEBUG - SQL final:', sql);
@@ -335,6 +340,7 @@ class Script {
   static async findSharedWithUser(userId, filters = {}) {
     try {
       const {
+        search,
         page = 1,
         limit = 10,
         sort_by = 'created_at',
@@ -345,7 +351,24 @@ class Script {
       const safePage = Math.max(1, parseInt(page) || 1);
       const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 10)); // Máximo 100 por página
       const safeOffset = (safePage - 1) * safeLimit;
-      
+
+      // Montar filtros SQL
+      let whereSql = 'WHERE ss.shared_with = ?';
+      const params = [parseInt(userId)];
+      const countParams = [parseInt(userId)];
+
+      if (search) {
+        whereSql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
+        params.push(`%${search}%`, `%${search}%`);
+        countParams.push(`%${search}%`, `%${search}%`);
+      }
+
+      // Query de contagem (sem GROUP BY, sem joins desnecessários)
+      const countSql = `SELECT COUNT(DISTINCT s.id) as total FROM scripts s INNER JOIN script_shares ss ON s.id = ss.script_id ${whereSql}`;
+      const countResult = await database.query(countSql, countParams);
+      const total = parseInt(countResult[0]?.total) || 0;
+
+      // Query de listagem
       let sql = `
         SELECT 
           s.*,
@@ -356,23 +379,15 @@ class Script {
         INNER JOIN script_shares ss ON s.id = ss.script_id
         LEFT JOIN users u ON s.created_by = u.id
         LEFT JOIN script_messages sm ON s.id = sm.script_id
-        WHERE ss.shared_with = ?
+        ${whereSql}
         GROUP BY s.id
       `;
-      const params = [parseInt(userId)];
-
-      // Contar total
-      const countSql = sql.replace('SELECT s.*, u.username as creator_name, COUNT(sm.id) as message_count, COUNT(DISTINCT sm.character_id) as character_count', 'SELECT COUNT(DISTINCT s.id) as total');
-      const countResult = await database.query(countSql, params);
-      const total = parseInt(countResult[0].total) || 0;
 
       // Ordenação
       const allowedSortFields = ['title', 'created_at', 'updated_at', 'message_count'];
       const allowedSortOrders = ['asc', 'desc'];
-      
       const sortField = allowedSortFields.includes(sort_by) ? sort_by : 'created_at';
       const sortOrder = allowedSortOrders.includes(sort_order) ? sort_order : 'desc';
-      
       sql += ` ORDER BY ${sortField} ${sortOrder.toUpperCase()} LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
       const rows = await database.query(sql, params);
