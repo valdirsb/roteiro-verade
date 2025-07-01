@@ -2,7 +2,7 @@
   <div class="modal share-script-modal">
     <div class="modal-header">
       <h2>Compartilhar Roteiro</h2>
-      <button class="close-btn" @click="closeModal">
+      <button class="close-btn" @click="closeModal('shareScript')">
         <span>&times;</span>
       </button>
     </div>
@@ -32,6 +32,7 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 500px;
   width: 100%;
+  display: block !important;
 }
 
 .modal-header {
@@ -73,4 +74,4 @@ p {
   color: var(--text-secondary);
   margin: 0;
 }
-</style> 
+</style>

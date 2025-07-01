@@ -2,7 +2,7 @@
   <div class="modal create-script-modal">
     <div class="modal-header">
       <h2>Novo Roteiro</h2>
-      <button class="close-btn" @click="closeModal">
+      <button class="close-btn" @click="closeModal('createScript')">
         <span>&times;</span>
       </button>
     </div>
@@ -21,6 +21,8 @@ export default {
     ...mapActions({
       closeModal: 'ui/closeModal'
     })
+  },
+  mounted() {
   }
 }
 </script>
@@ -32,6 +34,7 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 500px;
   width: 100%;
+  display: block !important;
 }
 
 .modal-header {
@@ -73,4 +76,4 @@ p {
   color: var(--text-secondary);
   margin: 0;
 }
-</style> 
+</style>
