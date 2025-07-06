@@ -3,8 +3,25 @@
     <div class="scripts-container">
       <div class="scripts-header">
         <h1>Roteiros</h1>
-        <button class="new-script-btn">Novo Roteiro</button>
+        <button class="new-script-btn" @click="createScript">Novo Roteiro</button>
       </div>
+
+      <!-- Abas de navegação -->
+      <div class="scripts-tabs">
+        <button
+          @click="changeTab('user')"
+          :class="['tab-button', { active: activeTab === 'user' }]"
+        >
+          Meus Roteiros
+        </button>
+        <button
+          @click="changeTab('public')"
+          :class="['tab-button', { active: activeTab === 'public' }]"
+        >
+          Roteiros Públicos
+        </button>
+      </div>
+
       <div class="scripts-filters">
         <input
           v-model="search"
@@ -12,12 +29,13 @@
           placeholder="Buscar por título..."
           class="search-input"
         />
-        <select v-model="statusFilter" class="status-select">
+        <select v-model="statusFilter" class="status-select" v-if="activeTab === 'user'">
           <option value=null>Todos os Status</option>
           <option value=true>Público</option>
           <option value=false>Privado</option>
         </select>
       </div>
+
       <table class="scripts-table">
         <thead>
           <tr>
@@ -49,9 +67,27 @@
             <td>{{ script.message_count }}</td>
             <td class="actions-cell">
               <BaseButton icon="fa-eye" variant="ghost" size="small" title="Visualizar" />
-              <BaseButton icon="fa-edit" variant="ghost" size="small" title="Editar" />
-              <BaseButton icon="fa-trash" variant="ghost" size="small" title="Excluir" />
-              <BaseButton icon="fa-share-alt" variant="ghost" size="small" title="Compartilhar" />
+              <BaseButton
+                v-if="activeTab === 'user'"
+                icon="fa-edit"
+                variant="ghost"
+                size="small"
+                title="Editar"
+              />
+              <BaseButton
+                v-if="activeTab === 'user'"
+                icon="fa-trash"
+                variant="ghost"
+                size="small"
+                title="Excluir"
+              />
+              <BaseButton
+                v-if="activeTab === 'user'"
+                icon="fa-share-alt"
+                variant="ghost"
+                size="small"
+                title="Compartilhar"
+              />
             </td>
           </tr>
         </tbody>
@@ -77,6 +113,7 @@ export default {
   },
   data() {
     return {
+      activeTab: 'user', // 'user' ou 'public'
       search: '',
       statusFilter: null,
       scripts: [],
@@ -100,22 +137,43 @@ export default {
       this.pagination.page = 1;
       this.fetchScripts();
     },
+    activeTab() {
+      this.pagination.page = 1;
+      this.search = '';
+      this.statusFilter = null;
+      this.fetchScripts();
+    }
   },
   created() {
     this.fetchScripts();
   },
   methods: {
-    ...mapActions(['notify']),
+    ...mapActions({
+      openModal: 'ui/openModal',
+      notify: 'notify'
+    }),
+
+    createScript() {
+      this.openModal('createScript')
+    },
+
+    changeTab(tab) {
+      console.log('[changeTab] Mudando para aba:', tab);
+      this.activeTab = tab;
+    },
     async fetchScripts() {
       this.loading = true;
       const params = {
+        type: this.activeTab,
         search: this.search,
         page: this.pagination.page,
         limit: this.pagination.limit,
         sort_by: this.sortBy,
         sort_order: this.sortOrder
       };
-      if (this.statusFilter !== "null" && this.statusFilter !== null ) {
+
+      // Apenas aplicar filtro de status para roteiros do usuário
+      if (this.activeTab === 'user' && this.statusFilter !== "null" && this.statusFilter !== null ) {
         params.is_public = this.statusFilter
       }
 
@@ -188,13 +246,43 @@ export default {
 }
 
 .new-script-btn {
-  background: var(--primary);
+  background: var(--primary-color);
   color: #fff;
   border: none;
   padding: 10px 20px;
   border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.scripts-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+  background: #f5f5f5;
+}
+
+.tab-button.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  background: #f8f9ff;
 }
 
 .scripts-filters {
@@ -275,7 +363,7 @@ export default {
   margin-top: 24px;
 }
 .pagination-container button {
-  background: var(--primary);
+  background: var(--primary-color);
   color: #fff;
   border: none;
   padding: 6px 16px;

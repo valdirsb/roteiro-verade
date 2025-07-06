@@ -5,6 +5,10 @@ class ScriptService {
   async getScripts(filters = {}) {
     const queryParams = new URLSearchParams();
 
+    if (filters.type) {
+      queryParams.append('type', filters.type);
+    }
+
     if (filters.search) {
       queryParams.append('search', filters.search);
     }
