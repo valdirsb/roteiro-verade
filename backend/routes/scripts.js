@@ -3,7 +3,7 @@ const router = express.Router();
 const ScriptController = require('../controllers/scriptController');
 const { authenticateToken } = require('../middleware/auth');
 const { requireRole } = require('../middleware/authorization');
-const { validateScript, validateMessage, validatePagination } = require('../utils/validation');
+const { validateScript, validateMessage, validatePagination, validateScriptFilters } = require('../utils/validation');
 
 /**
  * @swagger
@@ -141,7 +141,7 @@ router.use(authenticateToken);
  *       '200':
  *         description: Lista de roteiros do usuário
  */
-router.get('/user/scripts', validatePagination(), ScriptController.listScripts);
+router.get('/user/scripts', validateScriptFilters(), ScriptController.listScripts);
 
 /**
  * @swagger

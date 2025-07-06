@@ -13,9 +13,11 @@ class ScriptController {
         limit, 
         sort_by, 
         sort_order,
-        type = 'all' // all, public, user, shared
+        type = 'user' // all, public, user, shared
       } = req.query;
       const userId = req.user?.id;
+
+      console.log("DEBUG - req", req.query )
       
       let result;
       
@@ -66,9 +68,9 @@ class ScriptController {
           if (userId) {
             // Usuário logado: mostrar seus roteiros, públicos e compartilhados
             const [userScripts, publicScripts, sharedScripts] = await Promise.all([
-              Script.findByUser(userId, { search, is_public, page: 1, limit: 5 }),
-              Script.findPublic({ search, page: 1, limit: 5 }),
-              Script.findSharedWithUser(userId, { page: 1, limit: 5 })
+              Script.findByUser(userId, { search, is_public, page: parseInt(page) || 1, limit: 5 }),
+              Script.findPublic({ search, page: parseInt(page) || 1, limit: 5 }),
+              Script.findSharedWithUser(userId, { page: parseInt(page) || 1, limit: 5 })
             ]);
             
             result = {

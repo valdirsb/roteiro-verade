@@ -4,34 +4,38 @@ class ScriptService {
   // Listar todos os roteiros
   async getScripts(filters = {}) {
     const queryParams = new URLSearchParams();
-    
+
     if (filters.search) {
       queryParams.append('search', filters.search);
     }
-    
+
     if (filters.status) {
       queryParams.append('status', filters.status);
     }
-    
+
     if (filters.limit) {
       queryParams.append('limit', filters.limit);
     }
-    
-    if (filters.offset) {
-      queryParams.append('offset', filters.offset);
+
+    if (filters.page) {
+      queryParams.append('page', filters.page);
     }
-    
+
     if (filters.sort_by) {
       queryParams.append('sort_by', filters.sort_by);
     }
-    
+
     if (filters.sort_order) {
       queryParams.append('sort_order', filters.sort_order);
     }
-    
+
+    if (filters.is_public) {
+      queryParams.append('is_public', filters.is_public);
+    }
+
     const queryString = queryParams.toString();
-    const url = queryString ? `/scripts?${queryString}` : '/scripts';
-    
+    const url = queryString ? `/scripts/user/scripts?${queryString}` : '/scripts/user/scripts';
+
     return await apiGet(url);
   }
 
@@ -63,13 +67,13 @@ class ScriptService {
   // Exportar roteiro
   async exportScript(id, format = 'json') {
     const response = await apiGet(`/scripts/${id}/export?format=${format}`);
-    
+
     if (response.success) {
       // Criar download do arquivo
       const blob = new Blob([JSON.stringify(response.data, null, 2)], {
         type: 'application/json'
       });
-      
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -79,7 +83,7 @@ class ScriptService {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }
-    
+
     return response;
   }
 
@@ -87,7 +91,7 @@ class ScriptService {
   async importScript(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     return await apiPost('/scripts/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -178,22 +182,22 @@ class ScriptService {
   // Obter relatório de atividade
   async getActivityReport(filters = {}) {
     const queryParams = new URLSearchParams();
-    
+
     if (filters.start_date) {
       queryParams.append('start_date', filters.start_date);
     }
-    
+
     if (filters.end_date) {
       queryParams.append('end_date', filters.end_date);
     }
-    
+
     if (filters.user_id) {
       queryParams.append('user_id', filters.user_id);
     }
-    
+
     const queryString = queryParams.toString();
     const url = queryString ? `/scripts/report?${queryString}` : '/scripts/report';
-    
+
     return await apiGet(url);
   }
 
@@ -202,27 +206,27 @@ class ScriptService {
   // Verificar se roteiro existe
   async scriptExists(title, excludeId = null) {
     const response = await this.getScripts({ search: title });
-    
+
     if (response.success) {
-      return response.data.some(script => 
-        script.title.toLowerCase() === title.toLowerCase() && 
+      return response.data.some(script =>
+        script.title.toLowerCase() === title.toLowerCase() &&
         script.id !== excludeId
       );
     }
-    
+
     return false;
   }
 
   // Obter roteiro por título
   async getScriptByTitle(title) {
     const response = await this.getScripts({ search: title });
-    
+
     if (response.success) {
-      return response.data.find(script => 
+      return response.data.find(script =>
         script.title.toLowerCase() === title.toLowerCase()
       );
     }
-    
+
     return null;
   }
 
@@ -232,7 +236,7 @@ class ScriptService {
       ...filters,
       search: query
     };
-    
+
     return await this.getScripts(searchFilters);
   }
 
@@ -243,19 +247,19 @@ class ScriptService {
 
   // Obter roteiros recentes
   async getRecentScripts(limit = 10) {
-    return await this.getScripts({ 
-      limit, 
-      sort_by: 'updated_at', 
-      sort_order: 'desc' 
+    return await this.getScripts({
+      limit,
+      sort_by: 'updated_at',
+      sort_order: 'desc'
     });
   }
 
   // Obter roteiros populares
   async getPopularScripts(limit = 10) {
-    return await this.getScripts({ 
-      limit, 
-      sort_by: 'message_count', 
-      sort_order: 'desc' 
+    return await this.getScripts({
+      limit,
+      sort_by: 'message_count',
+      sort_order: 'desc'
     });
   }
 
@@ -264,13 +268,13 @@ class ScriptService {
   // Fazer backup de todos os roteiros
   async backupAllScripts() {
     const response = await apiGet('/scripts/backup');
-    
+
     if (response.success) {
       // Criar download do arquivo
       const blob = new Blob([JSON.stringify(response.data, null, 2)], {
         type: 'application/json'
       });
-      
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -280,7 +284,7 @@ class ScriptService {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }
-    
+
     return response;
   }
 
@@ -288,7 +292,7 @@ class ScriptService {
   async restoreFromBackup(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     return await apiPost('/scripts/restore', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -297,4 +301,4 @@ class ScriptService {
   }
 }
 
-export default new ScriptService(); 
+export default new ScriptService();

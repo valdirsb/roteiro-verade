@@ -13,9 +13,9 @@
           class="search-input"
         />
         <select v-model="statusFilter" class="status-select">
-          <option value="">Todos os Status</option>
-          <option value="ativo">Ativo</option>
-          <option value="inativo">Inativo</option>
+          <option value=null>Todos os Status</option>
+          <option value=true>Público</option>
+          <option value=false>Privado</option>
         </select>
       </div>
       <table class="scripts-table">
@@ -78,7 +78,7 @@ export default {
   data() {
     return {
       search: '',
-      statusFilter: '',
+      statusFilter: null,
       scripts: [],
       loading: false,
       pagination: {
@@ -108,21 +108,30 @@ export default {
     ...mapActions(['notify']),
     async fetchScripts() {
       this.loading = true;
+      const params = {
+        search: this.search,
+        page: this.pagination.page,
+        limit: this.pagination.limit,
+        sort_by: this.sortBy,
+        sort_order: this.sortOrder
+      };
+      if (this.statusFilter !== "null" && this.statusFilter !== null ) {
+        params.is_public = this.statusFilter
+      }
+
+      console.log('[fetchScripts] Parâmetros enviados para API:', params);
       try {
-        const response = await scriptService.getScripts({
-          search: this.search,
-          status: this.statusFilter,
-          page: this.pagination.page,
-          limit: this.pagination.limit,
-          sort_by: this.sortBy,
-          sort_order: this.sortOrder
-        });
+        const response = await scriptService.getScripts(params);
+        console.log('[fetchScripts] Resposta da API:', response);
         if (response.success) {
           this.scripts = response.data.data.scripts;
           this.pagination = {
             ...this.pagination,
-            ...response.data.data.pagination
+            total: response.data.data.pagination.total,
+            pages: response.data.data.pagination.pages,
+            limit: response.data.data.pagination.limit
           };
+          console.log('[fetchScripts] Estado de pagination após atualização:', this.pagination);
         } else {
           this.scripts = [];
           this.notify({ type: 'error', message: response.message || 'Erro ao buscar roteiros.' });

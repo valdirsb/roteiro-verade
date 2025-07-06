@@ -344,7 +344,8 @@ const querySchemas = {
     is_public: Joi.boolean(),
     created_by: Joi.number().integer().positive(),
     sort_by: Joi.string().valid('title', 'created_at', 'updated_at').default('created_at'),
-    sort_order: Joi.string().valid('asc', 'desc').default('desc')
+    sort_order: Joi.string().valid('asc', 'desc').default('desc'),
+    type: Joi.string().valid('all', 'user', 'public', 'shared').default('user')
   })
 };
 
