@@ -317,7 +317,7 @@ class AuthController {
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 10,
         role,
-        is_active: is_active === 'true' ? true : is_active === 'false' ? false : undefined
+        is_active: is_active === 'true' ? 1 : is_active === 'false' ? 0 : undefined
       });
 
       res.json({

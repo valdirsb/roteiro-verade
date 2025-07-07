@@ -138,7 +138,8 @@ class Character {
 
       if (is_active !== undefined) {
         updates.push('is_active = ?');
-        params.push(is_active);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        params.push(is_active ? 1 : 0);
       }
 
       if (updates.length === 0) {
@@ -282,7 +283,12 @@ class Character {
         limit = 10
       } = filters;
 
-      const offset = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+      console.log("FILTERS:", filters );
+
+      // Garantir que page e limit sejam números inteiros válidos
+      const safePage = Math.max(1, parseInt(page) || 1);
+      const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 10)); // Máximo 100 por página
+      const safeOffset = (safePage - 1) * safeLimit;
       
       const whereClauses = [];
       const params = [];
@@ -304,7 +310,8 @@ class Character {
 
       if (is_active !== undefined && is_active !== null) {
         whereClauses.push('c.is_active = ?');
-        params.push(is_active);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        params.push(is_active ? 1 : 0);
       }
       
       const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
@@ -326,11 +333,12 @@ class Character {
         LEFT JOIN users u ON c.created_by = u.id
         ${whereSql}
         ORDER BY c.name ASC
-        LIMIT ? OFFSET ?
+        LIMIT ${safeLimit} OFFSET ${safeOffset}
       `;
 
-      const dataParams = [...params, parseInt(limit, 10), offset];
-      const rows = await database.query(dataSql, dataParams);
+      console.log("dataSql: ", dataSql);
+      console.log("dataParams: ", params);
+      const rows = await database.query(dataSql, params);
       const characters = rows.map(row => new Character(row));
 
       return {

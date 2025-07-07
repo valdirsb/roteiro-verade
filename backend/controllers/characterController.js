@@ -18,7 +18,7 @@ class CharacterController {
 
       // Adicionar filtro is_active apenas se não incluir inativos
       if (includeInactive !== 'true') {
-        filters.is_active = true;
+        filters.is_active = 1; // Usar 1 em vez de true para MySQL
       }
 
       const result = await Character.findWithFilters(filters);
@@ -396,7 +396,7 @@ class CharacterController {
         search,
         color,
         created_by: created_by ? parseInt(created_by) : undefined,
-        is_active: is_active === 'true' ? true : is_active === 'false' ? false : undefined,
+        is_active: is_active === 'true' ? 1 : is_active === 'false' ? 0 : undefined,
         page: parseInt(page) || 1,
         limit: parseInt(limit) || 10
       };

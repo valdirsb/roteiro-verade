@@ -71,15 +71,7 @@ class Script {
       const safeOffset = (safePage - 1) * safeLimit;
 
       // Debug: log dos valores
-      console.log('DEBUG - Valores recebidos:', {
-        search,
-        is_public,
-        created_by,
-        page,
-        limit,
-        sort_by,
-        sort_order
-      });
+
 
       console.log('DEBUG - Valores processados:', {
         safePage,
@@ -103,7 +95,7 @@ class Script {
         const intValue = is_public ? 1 : 0;
         params.push(intValue);
         countParams.push(intValue);
-        console.log('DEBUG - is_public value:', is_public, 'convertido para inteiro:', intValue);
+
       }
 
       if (created_by) {
@@ -111,7 +103,7 @@ class Script {
         const userId = parseInt(created_by);
         params.push(userId);
         countParams.push(userId);
-        console.log('DEBUG - created_by value:', created_by, 'converted to:', userId);
+
       }
 
       // Query de contagem (sem GROUP BY, sem joins desnecessários)
@@ -140,8 +132,7 @@ class Script {
       const sortOrder = allowedSortOrders.includes(sort_order) ? sort_order : 'desc';
       sql += ` ORDER BY ${sortField} ${sortOrder.toUpperCase()} LIMIT ${safeLimit} OFFSET ${safeOffset}`;
 
-      console.log('DEBUG - SQL final:', sql);
-      console.log('DEBUG - Parâmetros finais:', params);
+
 
       const rows = await database.query(sql, params);
       const scripts = rows.map(row => new Script(row));
@@ -207,7 +198,8 @@ class Script {
 
       if (is_public !== undefined) {
         updates.push('is_public = ?');
-        params.push(is_public);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        params.push(is_public ? 1 : 0);
       }
 
       if (updates.length === 0) {

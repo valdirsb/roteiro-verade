@@ -134,7 +134,8 @@ class User {
 
       if (is_active !== undefined) {
         updates.push('is_active = ?');
-        params.push(is_active);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        params.push(is_active ? 1 : 0);
       }
 
       if (updates.length === 0) {
@@ -193,7 +194,8 @@ class User {
 
       if (is_active !== undefined) {
         sql += ' AND is_active = ?';
-        params.push(is_active);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        params.push(is_active ? 1 : 0);
       }
 
       sql += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
@@ -213,7 +215,8 @@ class User {
 
       if (is_active !== undefined) {
         countSql += ' AND is_active = ?';
-        countParams.push(is_active);
+        // Converter para inteiro para garantir compatibilidade com MySQL tinyint(1)
+        countParams.push(is_active ? 1 : 0);
       }
 
       const countResult = await database.query(countSql, countParams);

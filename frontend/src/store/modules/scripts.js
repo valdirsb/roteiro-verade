@@ -2,7 +2,7 @@ import scriptService from '@/services/scriptService';
 
 export default {
   namespaced: true,
-  
+
   state: {
     scripts: [],
     currentScript: null,
@@ -31,65 +31,65 @@ export default {
     SET_SCRIPTS(state, scripts) {
       state.scripts = scripts;
     },
-    
+
     SET_CURRENT_SCRIPT(state, script) {
       state.currentScript = script;
     },
-    
+
     SET_SCRIPT_MESSAGES(state, messages) {
       state.scriptMessages = messages;
     },
-    
+
     SET_SCRIPT_SHARES(state, shares) {
       state.scriptShares = shares;
     },
-    
+
     SET_SHARED_SCRIPTS(state, scripts) {
       state.sharedScripts = scripts;
     },
-    
+
     SET_MY_SHARED_SCRIPTS(state, scripts) {
       state.mySharedScripts = scripts;
     },
-    
+
     ADD_SCRIPT(state, script) {
       state.scripts.unshift(script);
     },
-    
+
     UPDATE_SCRIPT(state, updatedScript) {
       const index = state.scripts.findIndex(script => script.id === updatedScript.id);
       if (index !== -1) {
         state.scripts.splice(index, 1, updatedScript);
       }
-      
+
       if (state.currentScript && state.currentScript.id === updatedScript.id) {
         state.currentScript = updatedScript;
       }
     },
-    
+
     REMOVE_SCRIPT(state, scriptId) {
       state.scripts = state.scripts.filter(script => script.id !== scriptId);
-      
+
       if (state.currentScript && state.currentScript.id === scriptId) {
         state.currentScript = null;
       }
     },
-    
+
     ADD_MESSAGE(state, message) {
-      state.scriptMessages.push(message);
+      state.scriptMessages.data.messages.push(message);
     },
-    
+
     UPDATE_MESSAGE(state, updatedMessage) {
-      const index = state.scriptMessages.findIndex(msg => msg.id === updatedMessage.id);
+      const index = state.scriptMessages.data.messages.findIndex(msg => msg.id === updatedMessage.data.message.id);
       if (index !== -1) {
-        state.scriptMessages.splice(index, 1, updatedMessage);
+        state.scriptMessages.data.messages.splice(index, 1, updatedMessage);
       }
     },
-    
+
     REMOVE_MESSAGE(state, messageId) {
-      state.scriptMessages = state.scriptMessages.filter(msg => msg.id !== messageId);
+      state.scriptMessages = state.scriptMessages.data.messages.filter(msg => msg.id !== messageId);
     },
-    
+
     REORDER_MESSAGES(state, messageIds) {
       const reorderedMessages = [];
       messageIds.forEach(id => {
@@ -100,27 +100,27 @@ export default {
       });
       state.scriptMessages = reorderedMessages;
     },
-    
+
     SET_LOADING(state, loading) {
       state.isLoading = loading;
     },
-    
+
     SET_ERROR(state, error) {
       state.error = error;
     },
-    
+
     CLEAR_ERROR(state) {
       state.error = null;
     },
-    
+
     SET_FILTERS(state, filters) {
       state.filters = { ...state.filters, ...filters };
     },
-    
+
     SET_PAGINATION(state, pagination) {
       state.pagination = { ...state.pagination, ...pagination };
     },
-    
+
     CLEAR_SCRIPTS(state) {
       state.scripts = [];
       state.currentScript = null;
@@ -150,17 +150,17 @@ export default {
     async loadScripts({ commit }, filters = {}) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getScripts(filters);
-        
+
         if (response.success) {
           commit('SET_SCRIPTS', response.data.scripts || response.data);
-          
+
           if (response.data.pagination) {
             commit('SET_PAGINATION', response.data.pagination);
           }
-          
+
           return { success: true };
         } else {
           commit('SET_ERROR', response.error);
@@ -179,10 +179,10 @@ export default {
     async loadScript({ commit }, id) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getScript(id);
-        
+
         if (response.success) {
           commit('SET_CURRENT_SCRIPT', response.data);
           return { success: true, script: response.data };
@@ -203,10 +203,10 @@ export default {
     async createScript({ commit, dispatch }, scriptData) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.createScript(scriptData);
-        
+
         if (response.success) {
           commit('ADD_SCRIPT', response.data);
           dispatch('setSuccess', 'Roteiro criado com sucesso!', { root: true });
@@ -228,10 +228,10 @@ export default {
     async updateScript({ commit, dispatch }, { id, scriptData }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.updateScript(id, scriptData);
-        
+
         if (response.success) {
           commit('UPDATE_SCRIPT', response.data);
           dispatch('setSuccess', 'Roteiro atualizado com sucesso!', { root: true });
@@ -253,10 +253,10 @@ export default {
     async deleteScript({ commit, dispatch }, id) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.deleteScript(id);
-        
+
         if (response.success) {
           commit('REMOVE_SCRIPT', id);
           dispatch('setSuccess', 'Roteiro excluído com sucesso!', { root: true });
@@ -278,10 +278,10 @@ export default {
     async duplicateScript({ commit, dispatch }, id) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.duplicateScript(id);
-        
+
         if (response.success) {
           commit('ADD_SCRIPT', response.data);
           dispatch('setSuccess', 'Roteiro duplicado com sucesso!', { root: true });
@@ -305,10 +305,10 @@ export default {
     async loadScriptMessages({ commit }, scriptId) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getScriptMessages(scriptId);
-        
+
         if (response.success) {
           commit('SET_SCRIPT_MESSAGES', response.data);
           return { success: true };
@@ -329,14 +329,16 @@ export default {
     async addMessage({ commit, dispatch }, { scriptId, messageData }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.addMessage(scriptId, messageData);
-        
+
+
         if (response.success) {
+          console.log(response)
           commit('ADD_MESSAGE', response.data);
           dispatch('setSuccess', 'Mensagem adicionada com sucesso!', { root: true });
-          return { success: true, message: response.data };
+          return { success: true, message: response.data.data.message };
         } else {
           commit('SET_ERROR', response.error);
           return { success: false, error: response.error };
@@ -354,14 +356,14 @@ export default {
     async updateMessage({ commit, dispatch }, { scriptId, messageId, messageData }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.updateMessage(scriptId, messageId, messageData);
-        
+
         if (response.success) {
           commit('UPDATE_MESSAGE', response.data);
           dispatch('setSuccess', 'Mensagem atualizada com sucesso!', { root: true });
-          return { success: true, message: response.data };
+          return { success: true, message: response.data.data.message };
         } else {
           commit('SET_ERROR', response.error);
           return { success: false, error: response.error };
@@ -379,10 +381,10 @@ export default {
     async deleteMessage({ commit, dispatch }, { scriptId, messageId }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.deleteMessage(scriptId, messageId);
-        
+
         if (response.success) {
           commit('REMOVE_MESSAGE', messageId);
           dispatch('setSuccess', 'Mensagem excluída com sucesso!', { root: true });
@@ -404,10 +406,10 @@ export default {
     async reorderMessages({ commit, dispatch }, { scriptId, messageIds }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.reorderMessages(scriptId, messageIds);
-        
+
         if (response.success) {
           commit('REORDER_MESSAGES', messageIds);
           dispatch('setSuccess', 'Mensagens reordenadas com sucesso!', { root: true });
@@ -431,10 +433,10 @@ export default {
     async loadScriptShares({ commit }, scriptId) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getScriptShares(scriptId);
-        
+
         if (response.success) {
           commit('SET_SCRIPT_SHARES', response.data);
           return { success: true };
@@ -455,10 +457,10 @@ export default {
     async shareScript({ commit, dispatch }, { scriptId, shareData }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.shareScript(scriptId, shareData);
-        
+
         if (response.success) {
           dispatch('setSuccess', 'Roteiro compartilhado com sucesso!', { root: true });
           return { success: true, share: response.data };
@@ -479,10 +481,10 @@ export default {
     async loadSharedScripts({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getSharedScripts();
-        
+
         if (response.success) {
           commit('SET_SHARED_SCRIPTS', response.data);
           return { success: true };
@@ -503,10 +505,10 @@ export default {
     async loadMySharedScripts({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getMySharedScripts();
-        
+
         if (response.success) {
           commit('SET_MY_SHARED_SCRIPTS', response.data);
           return { success: true };
@@ -546,19 +548,19 @@ export default {
     async fetchRecentScripts({ commit }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
-      
+
       try {
         const response = await scriptService.getRecentScripts(5);
-        
+
         if (response.success) {
           // Atualizar apenas os roteiros recentes no estado
           const recentScripts = response.data.scripts || response.data;
           commit('SET_SCRIPTS', recentScripts);
-          
+
           if (response.data.pagination) {
             commit('SET_PAGINATION', response.data.pagination);
           }
-          
+
           return { success: true };
         } else {
           commit('SET_ERROR', response.error);
@@ -596,71 +598,71 @@ export default {
     hasError: state => !!state.error,
     filters: state => state.filters,
     pagination: state => state.pagination,
-    
+
     // Roteiros filtrados
     filteredScripts: (state) => {
       let scripts = state.scripts;
-      
+
       if (state.filters.search) {
         const search = state.filters.search.toLowerCase();
-        scripts = scripts.filter(script => 
+        scripts = scripts.filter(script =>
           script.title.toLowerCase().includes(search) ||
           (script.description && script.description.toLowerCase().includes(search))
         );
       }
-      
+
       if (state.filters.status) {
         scripts = scripts.filter(script => script.status === state.filters.status);
       }
-      
+
       return scripts;
     },
-    
+
     // Roteiro por ID
     scriptById: (state) => (id) => {
       return state.scripts.find(script => script.id === id);
     },
-    
+
     // Total de roteiros
     totalScripts: (state) => {
       return state.scripts.length;
     },
-    
+
     // Alias para totalScripts (usado no Dashboard)
     totalCount: (state) => {
       return state.scripts.length;
     },
-    
+
     // Roteiros recentes (últimos 5)
     recentScripts: (state) => {
       return [...state.scripts]
         .sort((a, b) => new Date(b.updatedAt || b.updated_at) - new Date(a.updatedAt || a.updated_at))
         .slice(0, 5);
     },
-    
+
     // Total de compartilhamentos (global)
     totalShares: (state) => {
       return state.scriptShares.length + state.sharedScripts.length + state.mySharedScripts.length;
     },
-    
+
     // Verificar se tem roteiros
     hasScripts: (state) => {
       return state.scripts.length > 0;
     },
-    
+
     // Verificar se tem mensagens
     hasMessages: (state) => {
       return state.scriptMessages.length > 0;
     },
-    
+
     // Total de mensagens
     totalMessages: (state) => {
       return state.scriptMessages.length;
     },
-    
+
     // Mensagens ordenadas por posição
     orderedMessages: (state) => {
       return [...state.scriptMessages].sort((a, b) => a.position - b.position);
     }
   }
-}; 
+};
