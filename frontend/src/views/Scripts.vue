@@ -66,7 +66,7 @@
             </td>
             <td>{{ script.message_count }}</td>
             <td class="actions-cell">
-              <BaseButton icon="fa-eye" variant="ghost" size="small" title="Visualizar" />
+              <BaseButton icon="fa-eye" variant="ghost" size="small" title="Visualizar" @click="openViewScriptModal(script.id)" />
               <BaseButton
                 v-if="activeTab === 'user'"
                 icon="fa-edit"
@@ -151,7 +151,9 @@ export default {
   methods: {
     ...mapActions({
       openModal: 'ui/openModal',
-      notify: 'notify'
+      notify: 'notify',
+      closeModal: 'ui/closeModal',
+      showError: 'ui/showError'
     }),
 
     createScript() {
@@ -163,12 +165,10 @@ export default {
         console.error('ID do script não fornecido')
         return
       }
-      console.log('Navegando para o script:', scriptId)
       this.$router.push(`/scripts/${scriptId}`)
     },
 
     changeTab(tab) {
-      console.log('[changeTab] Mudando para aba:', tab);
       this.activeTab = tab;
     },
     async fetchScripts() {
@@ -187,10 +187,8 @@ export default {
         params.is_public = this.statusFilter
       }
 
-      console.log('[fetchScripts] Parâmetros enviados para API:', params);
       try {
         const response = await scriptService.getScripts(params);
-        console.log('[fetchScripts] Resposta da API:', response);
         if (response.success) {
           this.scripts = response.data.data.scripts;
           this.pagination = {
@@ -199,7 +197,6 @@ export default {
             pages: response.data.data.pagination.pages,
             limit: response.data.data.pagination.limit
           };
-          console.log('[fetchScripts] Estado de pagination após atualização:', this.pagination);
         } else {
           this.scripts = [];
           this.notify({ type: 'error', message: response.message || 'Erro ao buscar roteiros.' });
@@ -233,6 +230,30 @@ export default {
         asc: this.sortBy === field && this.sortOrder === 'asc',
         desc: this.sortBy === field && this.sortOrder === 'desc',
       };
+    },
+    async openViewScriptModal(scriptId) {
+      if (!scriptId) return
+      this.loading = true
+      try {
+        // Buscar roteiro completo
+        const [scriptRes, messagesRes] = await Promise.all([
+          scriptService.getScript(scriptId),
+          scriptService.getScriptMessages(scriptId)
+        ])
+        if (scriptRes.success && messagesRes.success) {
+          this.$store.commit('ui/SET_MODAL_DATA', {
+            script: scriptRes.data.data.script,
+            messages: messagesRes.data.data.messages
+          })
+          this.$store.commit('ui/OPEN_MODAL', 'viewScript')
+        } else {
+          this.showError('Erro ao carregar roteiro para visualização.')
+        }
+      } catch {
+        this.showError('Erro ao carregar roteiro para visualização.')
+      } finally {
+        this.loading = false
+      }
     },
   }
 }
@@ -292,7 +313,11 @@ export default {
 .tab-button.active {
   color: var(--primary-color);
   border-bottom-color: var(--primary-color);
-  background: #f8f9ff;
+}
+
+[data-theme="dark"] .tab-button:hover {
+  color: var(--text-primary);
+  background: #334155;
 }
 
 .scripts-filters {
@@ -317,7 +342,6 @@ export default {
 .scripts-table {
   width: 100%;
   border-collapse: collapse;
-  background: #fff;
 }
 
 .scripts-table th,
@@ -329,7 +353,6 @@ export default {
 
 .scripts-table th {
   color: var(--text-primary);
-  background: #f9f9f9;
   cursor: pointer;
   user-select: none;
 }

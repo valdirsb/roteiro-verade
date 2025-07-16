@@ -87,7 +87,8 @@ Este documento detalha o plano de implementação da aplicação **Roteiro Verad
 **Funcionalidades Avançadas**
 - [ ] Drag & drop para mensagens
 - [ ] Editor de texto rico
-- [ ] Preview de roteiros
+- [x] Preview de roteiros
+- [x] Visualização de roteiros em modal com exportação rápida
 - [ ] Sistema de busca avançada
 - [ ] Exportação em diferentes formatos
 

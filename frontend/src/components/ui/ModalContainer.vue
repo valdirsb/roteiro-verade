@@ -1,12 +1,12 @@
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div 
-        v-if="hasOpenModals" 
+      <div
+        v-if="hasOpenModals"
         class="modal-overlay"
         @click="closeAllModals"
       >
-        <div 
+        <div
           class="modal-container"
           @click.stop
         >
@@ -44,6 +44,11 @@
           <Transition name="modal-content">
             <SettingsModal v-if="isModalOpen('settings')" />
           </Transition>
+
+          <!-- Modal de Visualização de Roteiro -->
+          <Transition name="modal-content">
+            <ViewScriptModal v-if="isModalOpen('viewScript')" :script="modalData?.script" :messages="modalData?.messages" />
+          </Transition>
         </div>
       </div>
     </Transition>
@@ -59,10 +64,11 @@ import CreateCharacterModal from './modals/CreateCharacterModal.vue'
 import ShareScriptModal from './modals/ShareScriptModal.vue'
 import ConfirmModal from './modals/ConfirmModal.vue'
 import SettingsModal from './modals/SettingsModal.vue'
+import ViewScriptModal from './modals/ViewScriptModal.vue'
 
 export default {
   name: 'ModalContainer',
-  
+
   components: {
     LoginModal,
     RegisterModal,
@@ -70,13 +76,15 @@ export default {
     CreateCharacterModal,
     ShareScriptModal,
     ConfirmModal,
-    SettingsModal
+    SettingsModal,
+    ViewScriptModal
   },
 
   computed: {
     ...mapGetters({
       hasOpenModals: 'ui/hasOpenModals',
-      isModalOpen: 'ui/isModalOpen'
+      isModalOpen: 'ui/isModalOpen',
+      modalData: 'ui/modalData'
     })
   },
 
@@ -116,6 +124,8 @@ export default {
   justify-content: center;
   z-index: 10000;
   padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .modal-container {
@@ -123,6 +133,8 @@ export default {
   max-width: 90vw;
   max-height: 90vh;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Animações do overlay */
@@ -157,10 +169,10 @@ export default {
   .modal-overlay {
     padding: 10px;
   }
-  
+
   .modal-container {
     max-width: 95vw;
     max-height: 95vh;
   }
 }
-</style> 
+</style>

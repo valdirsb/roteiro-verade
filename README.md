@@ -48,6 +48,7 @@ Cada personagem possui seu próprio avatar e cor distintiva para facilitar a ide
 *   **Compartilhamento**: Compartilhar roteiros entre usuários
 *   **Histórico de Versões**: Controle de alterações
 *   **Exportação**: Exportar roteiros em diferentes formatos
+*   **Visualização rápida de roteiros**: Visualize qualquer roteiro (público ou privado) em um modal, com preview fiel ao editor e opção de exportação direta.
 
 ### 🔍 Funcionalidades Avançadas
 

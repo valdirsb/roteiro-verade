@@ -13,8 +13,11 @@ export default {
       createCharacter: false,
       shareScript: false,
       confirmDelete: false,
-      settings: false
+      settings: false,
+      viewScript: false
     },
+    // Dados dinâmicos para modais
+    modalData: {},
 
     // Notificações
     notifications: [],
@@ -97,6 +100,15 @@ export default {
       Object.keys(state.modals).forEach(key => {
         state.modals[key] = false;
       });
+      state.modalData = {};
+    },
+
+    SET_MODAL_DATA(state, data) {
+      state.modalData = data || {};
+    },
+
+    CLEAR_MODAL_DATA(state) {
+      state.modalData = {};
     },
 
     // Notificações
@@ -172,7 +184,8 @@ export default {
         createCharacter: false,
         shareScript: false,
         confirmDelete: false,
-        settings: false
+        settings: false,
+        viewScript: false
       };
       state.notifications = [];
       state.loadingStates = {
@@ -366,6 +379,7 @@ export default {
     hasOpenModals: (state) => {
       return Object.values(state.modals).some(open => open);
     },
+    modalData: state => state.modalData,
 
     // Notificações
     notifications: state => state.notifications,
