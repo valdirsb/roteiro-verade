@@ -73,6 +73,7 @@
                 variant="ghost"
                 size="small"
                 title="Editar"
+                @click="viewScript(script.id)"
               />
               <BaseButton
                 v-if="activeTab === 'user'"
@@ -155,6 +156,15 @@ export default {
 
     createScript() {
       this.openModal('createScript')
+    },
+
+    viewScript(scriptId) {
+      if (!scriptId) {
+        console.error('ID do script não fornecido')
+        return
+      }
+      console.log('Navegando para o script:', scriptId)
+      this.$router.push(`/scripts/${scriptId}`)
     },
 
     changeTab(tab) {

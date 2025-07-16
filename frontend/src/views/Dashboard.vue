@@ -37,7 +37,7 @@
 
         <div class="stat-card">
           <div class="stat-card__icon">
-            <i class="fas fa-user-group"></i>
+            <i class="fa-solid fa-street-view"></i>
           </div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ charactersCount }}</div>
@@ -47,7 +47,7 @@
 
         <div class="stat-card">
           <div class="stat-card__icon">
-            <i class="fas fa-share"></i>
+            <i class="fas fa-share-alt"></i>
           </div>
           <div class="stat-card__content">
             <div class="stat-card__value">{{ sharesCount }}</div>

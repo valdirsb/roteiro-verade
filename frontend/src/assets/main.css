@@ -1,6 +1,6 @@
-@import './base.css';
+/* @import './base.css'; */
 @import './variables.css';
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
 
 /* Garantir que os ícones Font Awesome sejam exibidos */
 .fas, .fa {

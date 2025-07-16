@@ -63,6 +63,9 @@ router.get('/', validatePagination(), ScriptController.listScripts);
  */
 router.get('/public', validatePagination(), ScriptController.listScripts);
 
+// Rotas protegidas
+router.use(authenticateToken);
+
 /**
  * @swagger
  * /scripts/{id}:
@@ -126,8 +129,6 @@ router.get('/:id/messages', validatePagination(), ScriptController.getScriptMess
  */
 router.get('/:id/export', ScriptController.exportScript);
 
-// Rotas protegidas
-router.use(authenticateToken);
 
 /**
  * @swagger
