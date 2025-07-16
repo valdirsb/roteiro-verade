@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ScriptController = require('../controllers/scriptController');
-const { authenticateToken } = require('../middleware/auth');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { requireRole } = require('../middleware/authorization');
 const { validateScript, validateMessage, validatePagination, validateScriptFilters } = require('../utils/validation');
 
@@ -13,6 +13,8 @@ const { validateScript, validateMessage, validatePagination, validateScriptFilte
  *   - name: Mensagens de Roteiro
  *     description: Endpoints para gerenciar as mensagens dentro de um roteiro
  */
+
+router.use(optionalAuth);
 
 /**
  * @swagger
