@@ -501,6 +501,128 @@ class Script {
       character_count: this.character_count
     };
   }
+
+  /**
+   * Consulta unificada de roteiros relevantes para um usuário.
+   *
+   * Retorna todos os roteiros que:
+   *   - Foram criados pelo usuário (privados ou públicos)
+   *   - São públicos e criados por outros usuários
+   *   - Foram compartilhados com o usuário (exceto os que ele mesmo criou)
+   *
+   * Aplica filtros globais de busca, ordenação e paginação sobre o conjunto total, sem duplicidade.
+   *
+   * @param {number} userId - ID do usuário autenticado
+   * @param {Object} filters - Filtros e opções de paginação/ordenação
+   * @param {string} [filters.search] - Texto para busca em título/descrição
+   * @param {number} [filters.page=1] - Página (1-based)
+   * @param {number} [filters.limit=10] - Limite de itens por página
+   * @param {string} [filters.sort_by='created_at'] - Campo de ordenação global (title, created_at, updated_at, message_count, character_count)
+   * @param {string} [filters.sort_order='desc'] - Ordem (asc|desc)
+   * @returns {Promise<{scripts: Script[], pagination: {page: number, limit: number, total: number, pages: number}}>} Lista paginada de roteiros e metadados de paginação
+   *
+   * Observações:
+   * - A consulta utiliza UNION para garantir ausência de duplicidade.
+   * - LIMIT/OFFSET são interpolados diretamente no SQL por compatibilidade com MySQL.
+   * - Para grandes volumes, monitore o desempenho e avalie índices nas colunas mais filtradas/ordenadas.
+   */
+  static async findAllForUser(userId, filters = {}) {
+    try {
+      const {
+        search,
+        page = 1,
+        limit = 10,
+        sort_by = 'created_at',
+        sort_order = 'desc'
+      } = filters;
+
+      const safePage = Math.max(1, parseInt(page) || 1);
+      const safeLimit = Math.max(1, Math.min(100, parseInt(limit) || 10));
+      const safeOffset = (safePage - 1) * safeLimit;
+
+      // Campos de ordenação permitidos
+      const allowedSortFields = ['title', 'created_at', 'updated_at', 'message_count', 'character_count'];
+      const allowedSortOrders = ['asc', 'desc'];
+      const sortField = allowedSortFields.includes(sort_by) ? sort_by : 'created_at';
+      const sortOrder = allowedSortOrders.includes(sort_order.toLowerCase()) ? sort_order : 'desc';
+
+      // Montar SQL e parâmetros para cada bloco do UNION
+      const selectCols = 's.id, s.title, s.description, s.is_public, s.created_by, s.created_at, s.updated_at, u.username as creator_name';
+      let unionSql = '';
+      let unionParams = [];
+
+      // 1. Meus roteiros
+      unionSql += `SELECT ${selectCols} FROM scripts s LEFT JOIN users u ON s.created_by = u.id WHERE s.created_by = ?`;
+      unionParams.push(userId);
+      if (search) {
+        unionSql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
+        unionParams.push(`%${search}%`, `%${search}%`);
+      }
+
+      // 2. Roteiros públicos de outros usuários
+      unionSql += ` UNION SELECT ${selectCols} FROM scripts s LEFT JOIN users u ON s.created_by = u.id WHERE s.is_public = 1 AND s.created_by != ?`;
+      unionParams.push(userId);
+      if (search) {
+        unionSql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
+        unionParams.push(`%${search}%`, `%${search}%`);
+      }
+
+      // 3. Roteiros compartilhados comigo (exceto os que já são meus)
+      unionSql += ` UNION SELECT ${selectCols} FROM scripts s INNER JOIN script_shares ss ON s.id = ss.script_id LEFT JOIN users u ON s.created_by = u.id WHERE ss.shared_with = ? AND s.created_by != ?`;
+      unionParams.push(userId, userId);
+      if (search) {
+        unionSql += ' AND (s.title LIKE ? OR s.description LIKE ?)';
+        unionParams.push(`%${search}%`, `%${search}%`);
+      }
+
+      // Envolver o UNION em uma subquery para aplicar ordenação, paginação e agregações
+      let finalSql = `
+        SELECT sq.*, 
+          (SELECT COUNT(sm.id) FROM script_messages sm WHERE sm.script_id = sq.id) as message_count,
+          (SELECT COUNT(DISTINCT sm.character_id) FROM script_messages sm WHERE sm.script_id = sq.id) as character_count
+        FROM (
+          ${unionSql}
+        ) sq
+        ORDER BY sq.${sortField} ${sortOrder.toUpperCase()}
+        LIMIT ${safeLimit} OFFSET ${safeOffset}
+      `;
+      // unionParams.push(safeLimit, safeOffset); // Remover esses parâmetros
+
+      // Query de contagem total
+      let countSql = `
+        SELECT COUNT(DISTINCT sq.id) as total
+        FROM (
+          ${unionSql}
+        ) sq
+      `;
+      const countParams = unionParams; // Todos os params exceto limit/offset
+
+      // Log para depuração
+      logger.info('SQL final findAllForUser', { sql: finalSql, params: unionParams });
+      logger.info('SQL count findAllForUser', { sql: countSql, params: countParams });
+
+      // Execução
+      const [rows, countResult] = await Promise.all([
+        database.query(finalSql, unionParams),
+        database.query(countSql, countParams)
+      ]);
+      const total = parseInt(countResult[0]?.total) || 0;
+      const scripts = rows.map(row => new Script(row));
+
+      return {
+        scripts,
+        pagination: {
+          page: safePage,
+          limit: safeLimit,
+          total,
+          pages: Math.ceil(total / safeLimit)
+        }
+      };
+    } catch (error) {
+      logger.error('Erro ao buscar roteiros unificados para usuário:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = Script; 

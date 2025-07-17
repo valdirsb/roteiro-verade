@@ -66,26 +66,14 @@ class ScriptController {
           
         default: // all
           if (userId) {
-            // Usuário logado: mostrar seus roteiros, públicos e compartilhados
-            const [userScripts, publicScripts, sharedScripts] = await Promise.all([
-              Script.findByUser(userId, { search, is_public, page: parseInt(page) || 1, limit: 5 }),
-              Script.findPublic({ search, page: parseInt(page) || 1, limit: 5 }),
-              Script.findSharedWithUser(userId, { page: parseInt(page) || 1, limit: 5 })
-            ]);
-            
-            result = {
-              scripts: [
-                ...userScripts.scripts,
-                ...publicScripts.scripts,
-                ...sharedScripts.scripts
-              ].slice(0, parseInt(limit) || 10),
-              pagination: {
-                page: parseInt(page) || 1,
-                limit: parseInt(limit) || 10,
-                total: userScripts.pagination.total + publicScripts.pagination.total + sharedScripts.pagination.total,
-                pages: Math.ceil((userScripts.pagination.total + publicScripts.pagination.total + sharedScripts.pagination.total) / (parseInt(limit) || 10))
-              }
-            };
+            // Usuário logado: mostrar todos os roteiros relevantes em consulta única
+            result = await Script.findAllForUser(userId, {
+              search,
+              page: parseInt(page) || 1,
+              limit: parseInt(limit) || 10,
+              sort_by,
+              sort_order
+            });
           } else {
             // Usuário não logado: apenas roteiros públicos
             result = await Script.findPublic({
@@ -129,23 +117,21 @@ class ScriptController {
 
       // Buscar roteiros recentes usando o método findAll do modelo
       const filters = {
-        limit: parseInt(limit),
-        sort_by: 'updated_at',
-        sort_order: 'desc'
+        page: 1,
+        limit: parseInt(limit) || 10,
+        sort_by: "updated_at",
+        sort_order: "DESC"
       };
 
       let formattedScripts = [];
 
       if (userId) {
-        const [userScripts, publicScripts] = await Promise.all([
-          Script.findAll({ ...filters, created_by: userId }),
-          Script.findPublic(filters)
-        ]);
-        const allScripts = [
-          ...userScripts.scripts,
-          ...publicScripts.scripts
-        ].sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+
+        const result = await Script.findAllForUser(userId, filters);
+
+        const allScripts = result.scripts.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
          .slice(0, parseInt(limit));
+
         formattedScripts = allScripts.map(script => ({
           id: script.id,
           title: script.title,

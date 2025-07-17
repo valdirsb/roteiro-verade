@@ -30,9 +30,10 @@ const schemas = {
       title: { type: 'string', example: 'A História do Universo' },
       description: { type: 'string', example: 'Um roteiro sobre a origem do cosmos.' },
       is_public: { type: 'boolean', example: true },
-      owner_id: { type: 'integer', example: 1 },
+      creator_name: { type: 'string', example: 'João da Silva' },
       created_at: { type: 'string', format: 'date-time' },
-      updated_at: { type: 'string', format: 'date-time' },
+      message_count: { type: 'integer', example: 8 },
+      character_count: { type: 'integer', example: 5 },
     },
   },
   ScriptMessage: {
