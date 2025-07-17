@@ -71,7 +71,11 @@ class CharacterController {
   // Criar personagem (apenas admin)
   static async createCharacter(req, res) {
     try {
-      const { name, color, avatar_url } = req.body;
+      const { name, color } = req.body;
+      let avatar_url = null;
+      if (req.file && req.file.filename) {
+        avatar_url = `/uploads/characters/${req.file.filename}`;
+      }
       
       const character = await Character.create({
         name,

@@ -94,7 +94,7 @@ router.get('/:id', CharacterController.getCharacter);
 router.post(
   '/',
   authenticateToken,
-  requireRole('admin'),
+  requireRole(['admin']),
   upload.single('image'),
   validateCharacter('create'),
   CharacterController.createCharacter
