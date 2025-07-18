@@ -7,20 +7,42 @@
       </button>
     </div>
     <div class="modal-body">
-      <p>Modal de confirmação em desenvolvimento.</p>
+      <p>Tem certeza que deseja excluir o personagem <strong>{{ modalData.character?.name }}</strong>?</p>
+      <div class="actions">
+        <button class="btn btn-outline" @click="closeModal('confirmDelete')">Cancelar</button>
+        <button class="btn btn-danger" @click="confirm">Excluir</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'ConfirmModalComponent',
+  computed: {
+    ...mapGetters({ modalData: 'ui/modalData' })
+  },
   methods: {
     ...mapActions({
-      closeModal: 'ui/closeModal'
-    })
+      closeModal: 'ui/closeModal',
+      deleteCharacter: 'characters/deleteCharacter',
+      setSuccess: 'ui/setSuccess',
+      showError: 'ui/showError'
+    }),
+    async confirm() {
+      if (this.modalData && this.modalData.character) {
+        const id = this.modalData.character.id
+        const result = await this.deleteCharacter(id)
+        if (result.success) {
+          this.setSuccess('Personagem excluído com sucesso!')
+        } else {
+          this.showError(result.error?.message || 'Erro ao excluir personagem')
+        }
+      }
+      this.closeModal('confirmDelete')
+    }
   }
 }
 </script>
@@ -73,5 +95,32 @@ export default {
 p {
   color: var(--text-secondary);
   margin: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.btn {
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-outline {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+}
+.btn-danger {
+  background: var(--error-color);
+  color: #fff;
+}
+.btn-danger:hover {
+  background: #c53030;
 }
 </style>

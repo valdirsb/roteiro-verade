@@ -10,6 +10,9 @@
         <BaseButton size="sm" variant="outline" @click="editCharacter">
           <i class="fas fa-edit"></i>
         </BaseButton>
+        <BaseButton size="sm" variant="danger" @click="confirmDelete">
+          <i class="fas fa-trash"></i>
+        </BaseButton>
         <slot name="actions"></slot>
       </div>
     </div>
@@ -36,6 +39,10 @@ export default {
     editCharacter() {
       this.SET_MODAL_DATA({ character: this.character })
       this.openModal('createCharacter')
+    },
+    confirmDelete() {
+      this.SET_MODAL_DATA({ character: this.character })
+      this.openModal('confirmDelete')
     }
   }
 }

@@ -51,7 +51,7 @@ export default {
     },
 
     REMOVE_CHARACTER(state, characterId) {
-      state.characters = state.characters.filter(char => char.id !== characterId);
+      state.characters.data.characters = state.characters.data.characters.filter(char => char.id !== characterId);
 
       if (state.currentCharacter && state.currentCharacter.id === characterId) {
         state.currentCharacter = null;
