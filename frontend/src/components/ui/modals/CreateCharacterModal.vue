@@ -30,16 +30,17 @@
             <span class="required">*</span>
           </label>
           <div class="color-picker">
-            <div class="color-preview" :style="{ backgroundColor: form.color }"></div>
-            <input
-              v-model="form.color"
-              type="color"
-              class="color-input"
-              :disabled="isSubmitting"
-              @change="validateField('color')"
-            />
-            <span class="color-value">{{ form.color }}</span>
-          </div>
+            <div class="color-preview" :style="{ backgroundColor: form.color }" @click="triggerColorInput"></div>
+              <input
+                ref="colorInput"
+                v-model="form.color"
+                type="color"
+                class="color-input"
+                :disabled="isSubmitting"
+                @change="validateField('color')"
+              />
+              <span class="color-value">{{ form.color }}</span>
+            </div>
           <div v-if="errors.color" class="form-error">{{ errors.color }}</div>
         </div>
 
@@ -239,6 +240,12 @@ export default {
       this.$refs.fileInput.value = ''
     },
 
+    triggerColorInput() {
+      if (this.$refs.colorInput) {
+        this.$refs.colorInput.click();
+      }
+    },
+
     async handleSubmit() {
       if (!this.validateForm()) {
         return
@@ -303,9 +310,9 @@ export default {
   box-shadow: var(--shadow-xl);
   max-width: 600px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: block !important;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -346,6 +353,9 @@ export default {
 
 .modal-body {
   padding: 32px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .character-form {

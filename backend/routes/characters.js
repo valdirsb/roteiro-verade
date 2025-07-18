@@ -142,7 +142,7 @@ router.post(
 router.put(
   '/:id',
   authenticateToken,
-  requireRole('admin'),
+  requireRole(['admin']),
   upload.single('image'),
   validateCharacter('update'),
   CharacterController.updateCharacter
@@ -173,7 +173,7 @@ router.put(
 router.delete(
   '/:id',
   authenticateToken,
-  requireRole('admin'),
+  requireRole(['admin']),
   CharacterController.deactivateCharacter
 );
 

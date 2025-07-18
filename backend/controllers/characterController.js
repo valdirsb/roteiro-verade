@@ -114,8 +114,13 @@ class CharacterController {
   static async updateCharacter(req, res) {
     try {
       const { id } = req.params;
-      const updateData = req.body;
-      
+
+      const { name, color, is_active } = req.body;
+      let avatar_url = null;
+      if (req.file && req.file.filename) {
+        avatar_url = `/uploads/characters/${req.file.filename}`;
+      }
+
       const character = await Character.findById(parseInt(id));
       
       if (!character) {
@@ -125,7 +130,12 @@ class CharacterController {
         });
       }
 
-      const updatedCharacter = await character.update(updateData);
+      const updatedCharacter = await character.update({
+        name,
+        color,
+        avatar_url,
+        is_active
+      });
 
       logger.info(`Personagem atualizado por ${req.user.username}: ${updatedCharacter.name}`);
 

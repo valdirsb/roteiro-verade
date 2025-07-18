@@ -94,7 +94,7 @@ router.get('/', async (req, res) => {
     const stats = {
       total: {
         scripts: scriptsCount,
-        characters: charactersCount + 5, // +5 personagens padrão
+        characters: charactersCount,
         shares: sharesCount,
         users: usersCount
       },
