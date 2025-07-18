@@ -162,7 +162,7 @@ export default {
       closeModal: 'ui/closeModal',
       createCharacter: 'characters/createCharacter',
       setSuccess: 'ui/setSuccess',
-      setError: 'ui/setError'
+      showError: 'ui/showError'
     }),
 
     validateField(field) {
@@ -265,17 +265,18 @@ export default {
           characterData,
           file: this.selectedFile
         })
+        console.log('Resultado da criação do personagem:', result)
 
         if (result.success) {
           this.setSuccess('Personagem criado com sucesso!')
           this.closeModal('createCharacter')
           this.resetForm()
         } else {
-          this.setError(result.error?.message || 'Erro ao criar personagem')
+          this.showError(result.error?.message || 'Erro ao criar personagem')
         }
       } catch (error) {
         console.error('Erro ao criar personagem:', error)
-        this.setError('Erro inesperado ao criar personagem')
+        this.showError('Erro inesperado ao criar personagem')
       } finally {
         this.isSubmitting = false
       }

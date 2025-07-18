@@ -36,7 +36,7 @@ export default {
     },
 
     ADD_CHARACTER(state, character) {
-      state.characters.unshift(character);
+      state.characters.data.characters.unshift(character);
     },
 
     UPDATE_CHARACTER(state, updatedCharacter) {
@@ -104,6 +104,7 @@ export default {
 
       try {
         const response = await characterService.getCharactersWithFilters(filters);
+        console.log('Response da API em loadCharacters:', response);
 
         if (response.success) {
           commit('SET_CHARACTERS', response.data.characters || response.data);
@@ -158,12 +159,14 @@ export default {
       try {
         const response = await characterService.createCharacter(characterData, file);
 
+        console.log("DEBUG: ", response)
+
         if (response.success) {
-          commit('ADD_CHARACTER', response.data);
+          commit('ADD_CHARACTER', response.data.data.character);
           dispatch('setSuccess', 'Personagem criado com sucesso!', { root: true });
-          return { success: true, character: response.data };
+          return { success: true, character: response.data.data.character };
         } else {
-          commit('SET_ERROR', response.error);
+          // commit('SET_ERROR', response.error);
           return { success: false, error: response.error };
         }
       } catch {

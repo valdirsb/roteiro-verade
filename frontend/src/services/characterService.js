@@ -133,8 +133,8 @@ class CharacterService {
       queryParams.append('limit', filters.limit);
     }
 
-    if (filters.offset) {
-      queryParams.append('offset', filters.offset);
+    if (filters.page) {
+      queryParams.append('page', filters.page);
     }
 
     const queryString = queryParams.toString();
