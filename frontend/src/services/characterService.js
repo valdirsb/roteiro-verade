@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut, apiDelete, apiUpload } from './api.js';
+import { apiGet, apiPost, apiPut, apiDelete, apiUpload, apiRequest } from './api.js';
 
 class CharacterService {
   // Listar todos os personagens
@@ -11,9 +11,27 @@ class CharacterService {
     return await apiGet(`/characters/${id}`);
   }
 
-  // Criar novo personagem
-  async createCharacter(characterData) {
-    return await apiPost('/characters', characterData);
+    // Criar novo personagem
+  async createCharacter(characterData, file = null) {
+    if (file) {
+      // Se há arquivo, usar FormData
+      const formData = new FormData();
+      formData.append('name', characterData.name);
+      formData.append('color', characterData.color);
+      formData.append('image', file);
+
+      return await apiRequest({
+        method: 'POST',
+        url: '/characters',
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    } else {
+      // Se não há arquivo, usar JSON normal
+      return await apiPost('/characters', characterData);
+    }
   }
 
   // Atualizar personagem
@@ -75,53 +93,53 @@ class CharacterService {
   // Obter personagem por nome
   async getCharacterByName(name) {
     const response = await this.getCharacters();
-    
+
     if (response.success) {
-      return response.data.find(char => 
+      return response.data.find(char =>
         char.name.toLowerCase() === name.toLowerCase()
       );
     }
-    
+
     return null;
   }
 
   // Verificar se personagem existe
   async characterExists(name, excludeId = null) {
     const response = await this.getCharacters();
-    
+
     if (response.success) {
-      return response.data.some(char => 
-        char.name.toLowerCase() === name.toLowerCase() && 
+      return response.data.some(char =>
+        char.name.toLowerCase() === name.toLowerCase() &&
         char.id !== excludeId
       );
     }
-    
+
     return false;
   }
 
   // Obter personagens com filtros
   async getCharactersWithFilters(filters = {}) {
     const queryParams = new URLSearchParams();
-    
+
     if (filters.search) {
       queryParams.append('search', filters.search);
     }
-    
+
     if (filters.is_default !== undefined) {
       queryParams.append('is_default', filters.is_default);
     }
-    
+
     if (filters.limit) {
       queryParams.append('limit', filters.limit);
     }
-    
+
     if (filters.offset) {
       queryParams.append('offset', filters.offset);
     }
-    
+
     const queryString = queryParams.toString();
     const url = queryString ? `/characters?${queryString}` : '/characters';
-    
+
     return await apiGet(url);
   }
 
@@ -133,43 +151,43 @@ class CharacterService {
   // Duplicar personagem
   async duplicateCharacter(id) {
     const characterResponse = await this.getCharacter(id);
-    
+
     if (!characterResponse.success) {
       return characterResponse;
     }
-    
+
     const character = characterResponse.data;
     const newName = `${character.name} (Cópia)`;
-    
+
     // Verificar se o nome já existe
     let finalName = newName;
     let counter = 1;
-    
+
     while (await this.characterExists(finalName)) {
       finalName = `${newName} ${counter}`;
       counter++;
     }
-    
+
     // Criar novo personagem com dados copiados
     const newCharacterData = {
       name: finalName,
       color: character.color,
       description: character.description
     };
-    
+
     return await this.createCharacter(newCharacterData);
   }
 
   // Exportar personagens
   async exportCharacters(format = 'json') {
     const response = await apiGet(`/characters/export?format=${format}`);
-    
+
     if (response.success) {
       // Criar download do arquivo
       const blob = new Blob([JSON.stringify(response.data, null, 2)], {
         type: 'application/json'
       });
-      
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -179,7 +197,7 @@ class CharacterService {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     }
-    
+
     return response;
   }
 
@@ -187,7 +205,7 @@ class CharacterService {
   async importCharacters(file) {
     const formData = new FormData();
     formData.append('file', file);
-    
+
     return await apiPost('/characters/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -196,4 +214,4 @@ class CharacterService {
   }
 }
 
-export default new CharacterService(); 
+export default new CharacterService();
