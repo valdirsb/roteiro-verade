@@ -19,11 +19,13 @@
       <div v-if="isLoading">Carregando personagens...</div>
       <div v-else-if="error" class="error">Erro ao carregar personagens.</div>
       <div v-else>
-        <CharacterCard
-          v-for="character in characters.data.characters"
-          :key="character.id"
-          :character="character"
-        />
+        <div class="characters-grid">
+          <CharacterCard
+            v-for="character in characters.data.characters"
+            :key="character.id"
+            :character="character"
+          />
+        </div>
         <div v-if="!characters.data.characters.length">Nenhum personagem encontrado.</div>
         <div class="pagination-bar" v-if="characters.data.pagination">
           <BaseButton :disabled="!hasPrevPage" @click="goToPrevPage">Anterior</BaseButton>
@@ -131,5 +133,18 @@ p {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+}
+.characters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px 22px;
+  margin-bottom: 32px;
+  margin-top: 8px;
+}
+@media (max-width: 600px) {
+  .characters-grid {
+    grid-template-columns: 1fr;
+    gap: 18px 0;
+  }
 }
 </style>
