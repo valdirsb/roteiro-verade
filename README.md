@@ -16,16 +16,17 @@ A aplicação inclui os seguintes personagens do universo Mundo em Verade:
 *   **Camila** 🔴 - Personagem com tema vermelho
 *   **Texto de Ação** ⚪ - Para descrições de cena e ações
 
-Cada personagem possui seu próprio avatar e cor distintiva para facilitar a identificação visual durante a criação do roteiro.
+Cada personagem possui seu próprio avatar e cor distintiva para facilitar a identificação visual durante a criação do roteiro. **Agora, a cor do personagem é destacada na borda do avatar, tanto no tema claro quanto no escuro.**
 
 ## ✨ Funcionalidades
 
 ### 🎨 Interface Moderna
 
-*   **Interface de Chat Intuitiva**: Interface similar a um chat para facilitar a criação de diálogos
-*   **Sistema de Temas**: Suporte a tema claro e escuro
-*   **Layout Responsivo**: Adaptável para desktop, tablet e mobile
-*   **Animações Suaves**: Transições e feedback visual
+*   **Listagem de Personagens em Grid Responsivo**: Visual moderno, com cards que destacam a cor do personagem, avatar centralizado e botões de ação discretos.
+*   **CRUD Completo de Personagens**: Listar, buscar, paginar, criar, editar (em modal) e excluir (com confirmação).
+*   **Suporte a Tema Claro/Escuro**: Visual consistente e elegante em ambos os temas.
+*   **Experiência de Usuário Refinada**: Botões de ação com tooltips, feedback visual, responsividade total.
+*   **Modularidade e Escalabilidade**: Componentes reutilizáveis, integração com Vuex e arquitetura pronta para expansão.
 
 ### 👥 Sistema de Usuários
 
@@ -353,15 +354,15 @@ docker-compose ps        # Status dos containers
 
 ## 📊 Status do Projeto
 
-*   **Progresso**: 95% concluído
+*   **Progresso**: 97% concluído
 *   **Fase Atual**: Polimento e Deploy
-*   **Próxima Meta**: Deploy em Produção
+*   **Próxima Meta**: Editor de roteiros avançado e permissões detalhadas
 
 ### ✅ Funcionalidades Implementadas
 
+*   CRUD completo de personagens com grid responsivo, modal de criação/edição, exclusão com confirmação e busca/paginação
 *   Sistema de autenticação JWT
 *   Gestão de usuários e permissões
-*   CRUD completo de personagens
 *   Sistema de roteiros com mensagens
 *   Compartilhamento de roteiros
 *   Interface responsiva
@@ -375,7 +376,7 @@ docker-compose ps        # Status dos containers
 ### 🔄 Em Desenvolvimento
 
 *   Editor de roteiros avançado
-*   Sistema de busca avançada
+*   Sistema de busca global
 *   Exportação em diferentes formatos
 *   Testes automatizados
 *   Deploy em produção
@@ -408,7 +409,7 @@ Para suporte técnico ou dúvidas:
 ### Versão 1.0 (Atual)
 
 *   ✅ Sistema básico de roteiros
-*   ✅ Gestão de personagens
+*   ✅ Gestão de personagens (CRUD completo e visual moderno)
 *   ✅ Autenticação e autorização
 *   ✅ Interface responsiva
 *   ✅ **Configuração Docker**
