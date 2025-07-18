@@ -116,7 +116,9 @@ class CharacterController {
       const { id } = req.params;
 
       const { name, color, is_active } = req.body;
+
       let avatar_url = null;
+      
       if (req.file && req.file.filename) {
         avatar_url = `/uploads/characters/${req.file.filename}`;
       }
@@ -128,6 +130,10 @@ class CharacterController {
           success: false,
           error: 'Personagem não encontrado'
         });
+      }
+
+      if (avatar_url == null && character.avatar_url != null) {
+        avatar_url = character.avatar_url
       }
 
       const updatedCharacter = await character.update({
