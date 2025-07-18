@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     ...mapActions('characters', ['loadCharacters', 'searchCharacters']),
-    ...mapActions('ui', ['openModal']),
+    ...mapActions('ui', ['openModal', 'clearModalData']),
     onSearch() {
       this.searchCharacters(this.searchQuery);
     },
@@ -89,6 +89,7 @@ export default {
       }
     },
     openCreateCharacterModal() {
+      this.clearModalData();
       this.openModal('createCharacter');
     }
   }

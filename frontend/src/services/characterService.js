@@ -35,8 +35,23 @@ class CharacterService {
   }
 
   // Atualizar personagem
-  async updateCharacter(id, characterData) {
-    return await apiPut(`/characters/${id}`, characterData);
+  async updateCharacter(id, characterData, file = null) {
+    if (file) {
+      const formData = new FormData();
+      formData.append('name', characterData.name);
+      formData.append('color', characterData.color);
+      formData.append('image', file);
+      return await apiRequest({
+        method: 'PUT',
+        url: `/characters/${id}`,
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+    } else {
+      return await apiPut(`/characters/${id}`, characterData);
+    }
   }
 
   // Excluir personagem

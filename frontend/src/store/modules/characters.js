@@ -177,12 +177,12 @@ export default {
     },
 
     // Atualizar personagem
-    async updateCharacter({ commit, dispatch }, { id, characterData }) {
+    async updateCharacter({ commit, dispatch }, { id, characterData, file = null }) {
       commit('SET_LOADING', true);
       commit('CLEAR_ERROR');
 
       try {
-        const response = await characterService.updateCharacter(id, characterData);
+        const response = await characterService.updateCharacter(id, characterData, file);
 
         console.log("DEBUG: ", response)
 

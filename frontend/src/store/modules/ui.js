@@ -364,6 +364,10 @@ export default {
     // Reset UI
     resetUI({ commit }) {
       commit('RESET_UI');
+    },
+
+    clearModalData({ commit }) {
+      commit('CLEAR_MODAL_DATA');
     }
   },
 

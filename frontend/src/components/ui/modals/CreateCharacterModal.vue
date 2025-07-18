@@ -121,6 +121,7 @@
 import { mapActions, mapGetters } from 'vuex'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
+import { getCharacterAvatarUrl } from '@/utils/backendConfig'
 
 export default {
   name: 'CreateCharacterModalComponent',
@@ -169,7 +170,7 @@ export default {
           this.editingId = data.character.id;
           this.form.name = data.character.name || '';
           this.form.color = data.character.color || '#8B5CF6';
-          this.avatarPreview = data.character.avatar_url || data.character.image || null;
+          this.avatarPreview = getCharacterAvatarUrl(data.character.avatar_url || data.character.image || null) ;
         } else {
           this.isEditMode = false;
           this.editingId = null;
@@ -185,7 +186,7 @@ export default {
       this.editingId = this.modalData.character.id;
       this.form.name = this.modalData.character.name || '';
       this.form.color = this.modalData.character.color || '#8B5CF6';
-      this.avatarPreview = this.modalData.character.avatar_url || this.modalData.character.image || null;
+      this.avatarPreview = getCharacterAvatarUrl(this.modalData.character.avatar_url || this.modalData.character.image || null) ;
     }
   },
 
@@ -197,6 +198,8 @@ export default {
       setSuccess: 'ui/setSuccess',
       showError: 'ui/showError'
     }),
+
+    getCharacterAvatarUrl,
 
     validateField(field) {
       this.errors[field] = ''
@@ -296,7 +299,7 @@ export default {
         // Criar personagem com arquivo (se houver)
         let result
         if (this.isEditMode && this.editingId) {
-          result = await this.updateCharacter({ id: this.editingId, characterData })
+          result = await this.updateCharacter({ id: this.editingId, characterData, file: this.selectedFile })
         } else {
           result = await this.createCharacter({ characterData, file: this.selectedFile })
         }
