@@ -40,9 +40,9 @@ export default {
     },
 
     UPDATE_CHARACTER(state, updatedCharacter) {
-      const index = state.characters.findIndex(char => char.id === updatedCharacter.id);
+      const index = state.characters.data.characters.findIndex(char => char.id === updatedCharacter.id);
       if (index !== -1) {
-        state.characters.splice(index, 1, updatedCharacter);
+        state.characters.data.characters.splice(index, 1, updatedCharacter);
       }
 
       if (state.currentCharacter && state.currentCharacter.id === updatedCharacter.id) {
@@ -159,8 +159,6 @@ export default {
       try {
         const response = await characterService.createCharacter(characterData, file);
 
-        console.log("DEBUG: ", response)
-
         if (response.success) {
           commit('ADD_CHARACTER', response.data.data.character);
           dispatch('setSuccess', 'Personagem criado com sucesso!', { root: true });
@@ -186,16 +184,18 @@ export default {
       try {
         const response = await characterService.updateCharacter(id, characterData);
 
+        console.log("DEBUG: ", response)
+
         if (response.success) {
-          commit('UPDATE_CHARACTER', response.data);
+          commit('UPDATE_CHARACTER', response.data.data.character);
           dispatch('setSuccess', 'Personagem atualizado com sucesso!', { root: true });
-          return { success: true, character: response.data };
+          return { success: true, character: response.data.data.character };
         } else {
           commit('SET_ERROR', response.error);
           return { success: false, error: response.error };
         }
       } catch {
-        const errorMessage = 'Erro ao atualizar personagem.';
+        const errorMessage = 'Erro ao atualizar personagem1111.';
         commit('SET_ERROR', { type: 'unknown', message: errorMessage });
         return { success: false, error: { type: 'unknown', message: errorMessage } };
       } finally {

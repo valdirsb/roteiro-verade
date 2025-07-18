@@ -6,15 +6,23 @@
     </div>
     <div class="info">
       <h3>{{ character.name }}</h3>
-      <slot name="actions"></slot>
+      <div class="actions">
+        <BaseButton size="sm" variant="outline" @click="editCharacter">
+          <i class="fas fa-edit"></i>
+        </BaseButton>
+        <slot name="actions"></slot>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { getCharacterAvatarUrl } from '@/utils/backendConfig'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import { mapActions, mapMutations } from 'vuex'
 export default {
   name: 'CharacterCard',
+  components: { BaseButton },
   props: {
     character: {
       type: Object,
@@ -22,8 +30,13 @@ export default {
     }
   },
   methods: {
-
-    getCharacterAvatarUrl
+    getCharacterAvatarUrl,
+    ...mapActions('ui', ['openModal']),
+    ...mapMutations('ui', ['SET_MODAL_DATA']),
+    editCharacter() {
+      this.SET_MODAL_DATA({ character: this.character })
+      this.openModal('createCharacter')
+    }
   }
 }
 </script>
@@ -64,6 +77,10 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+.actions {
+  display: flex;
+  gap: 8px;
 }
 h3 {
   margin: 0;

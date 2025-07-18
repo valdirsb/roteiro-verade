@@ -1,7 +1,7 @@
 <template>
   <div class="modal create-character-modal">
     <div class="modal-header">
-      <h2>Novo Personagem</h2>
+      <h2>{{ isEditMode ? 'Editar Personagem' : 'Novo Personagem' }}</h2>
       <button class="close-btn" @click="closeModal('createCharacter')">
         <span>&times;</span>
       </button>
@@ -108,8 +108,8 @@
             :loading="isSubmitting"
             :disabled="!isFormValid || isSubmitting"
           >
-            <i class="fas fa-plus"></i>
-            Criar Personagem
+            <i :class="isEditMode ? 'fas fa-save' : 'fas fa-plus'"></i>
+            {{ isEditMode ? 'Salvar Alterações' : 'Criar Personagem' }}
           </BaseButton>
         </div>
       </form>
@@ -118,7 +118,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import BaseInput from '@/components/ui/BaseInput.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
 
@@ -143,11 +143,14 @@ export default {
       },
       selectedFile: null,
       avatarPreview: null,
-      isSubmitting: false
+      isSubmitting: false,
+      isEditMode: false,
+      editingId: null
     }
   },
 
   computed: {
+    ...mapGetters({ modalData: 'ui/modalData' }),
     isFormValid() {
       return this.form.name.trim() &&
              this.form.color &&
@@ -157,10 +160,40 @@ export default {
     }
   },
 
+  watch: {
+    modalData: {
+      immediate: true,
+      handler(data) {
+        if (data && data.character) {
+          this.isEditMode = true;
+          this.editingId = data.character.id;
+          this.form.name = data.character.name || '';
+          this.form.color = data.character.color || '#8B5CF6';
+          this.avatarPreview = data.character.avatar_url || data.character.image || null;
+        } else {
+          this.isEditMode = false;
+          this.editingId = null;
+          this.resetForm();
+        }
+      }
+    }
+  },
+
+  mounted() {
+    if (this.modalData && this.modalData.character) {
+      this.isEditMode = true;
+      this.editingId = this.modalData.character.id;
+      this.form.name = this.modalData.character.name || '';
+      this.form.color = this.modalData.character.color || '#8B5CF6';
+      this.avatarPreview = this.modalData.character.avatar_url || this.modalData.character.image || null;
+    }
+  },
+
   methods: {
     ...mapActions({
       closeModal: 'ui/closeModal',
       createCharacter: 'characters/createCharacter',
+      updateCharacter: 'characters/updateCharacter',
       setSuccess: 'ui/setSuccess',
       showError: 'ui/showError'
     }),
@@ -261,22 +294,24 @@ export default {
         }
 
         // Criar personagem com arquivo (se houver)
-        const result = await this.createCharacter({
-          characterData,
-          file: this.selectedFile
-        })
-        console.log('Resultado da criação do personagem:', result)
+        let result
+        if (this.isEditMode && this.editingId) {
+          result = await this.updateCharacter({ id: this.editingId, characterData })
+        } else {
+          result = await this.createCharacter({ characterData, file: this.selectedFile })
+        }
+        console.log('Resultado da criação/edição do personagem:', result)
 
         if (result.success) {
-          this.setSuccess('Personagem criado com sucesso!')
+          this.setSuccess(this.isEditMode ? 'Personagem atualizado com sucesso!' : 'Personagem criado com sucesso!')
           this.closeModal('createCharacter')
           this.resetForm()
         } else {
-          this.showError(result.error?.message || 'Erro ao criar personagem')
+          this.showError(result.error?.message || (this.isEditMode ? 'Erro ao atualizar personagem' : 'Erro ao criar personagem'))
         }
       } catch (error) {
-        console.error('Erro ao criar personagem:', error)
-        this.showError('Erro inesperado ao criar personagem')
+        console.error('Erro ao criar/editar personagem:', error)
+        this.showError(this.isEditMode ? 'Erro inesperado ao atualizar personagem' : 'Erro inesperado ao criar personagem')
       } finally {
         this.isSubmitting = false
       }
