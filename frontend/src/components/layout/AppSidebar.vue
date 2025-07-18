@@ -164,9 +164,9 @@ export default {
   methods: {
     ...mapActions({
       closeSidebar: 'ui/closeSidebar',
-      logout: 'auth/logout',
-      openModal: 'ui/openModal'
+      logout: 'auth/logout'
     }),
+    ...mapActions('ui', ['openModal', 'clearModalData']),
 
     createScript() {
       this.openModal('createScript')
@@ -174,6 +174,7 @@ export default {
     },
 
     createCharacter() {
+      this.clearModalData();
       this.openModal('createCharacter')
       this.closeSidebar()
     },
