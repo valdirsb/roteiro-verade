@@ -4,22 +4,30 @@ import store from './store'
 import router from './router'
 import './assets/main.css'
 
-// Criar aplicação Vue
-const app = createApp(App)
+// Função assíncrona para inicializar a aplicação
+async function initializeApp() {
+  // Criar aplicação Vue
+  const app = createApp(App)
 
-// Usar store e router
-app.use(store)
-app.use(router)
+  // Usar store e router
+  app.use(store)
+  app.use(router)
 
-// Inicializar autenticação
-await store.dispatch('auth/initAuth')
-await store.dispatch('auth/checkAuth')
+  // Inicializar autenticação
+  await store.dispatch('auth/initAuth')
+  await store.dispatch('auth/checkAuth')
 
-// Montar aplicação
-app.mount('#app')
+  // Montar aplicação
+  app.mount('#app')
 
-// Inicializar UI quando a aplicação carregar
-store.dispatch('ui/initializeUI')
+  // Inicializar UI quando a aplicação carregar
+  store.dispatch('ui/initializeUI')
+}
+
+// Inicializar a aplicação
+initializeApp().catch(error => {
+  console.error('Erro ao inicializar a aplicação:', error)
+})
 
 // Listener para logout automático
 window.addEventListener('auth:logout', () => {
