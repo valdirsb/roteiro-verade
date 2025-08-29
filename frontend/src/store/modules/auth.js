@@ -88,6 +88,11 @@ export default {
 
     // Logout do usuário
     async logout({ commit, dispatch }) {
+      // Evitar logout duplicado
+      if (this.state.auth.isLoading) {
+        return;
+      }
+      
       commit('SET_LOADING', true);
 
       try {

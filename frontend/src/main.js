@@ -31,7 +31,10 @@ initializeApp().catch(error => {
 
 // Listener para logout automático
 window.addEventListener('auth:logout', () => {
-  store.dispatch('logout')
+  // Não precisamos chamar logout novamente, apenas limpar o estado
+  // O logout já foi feito pelo authService
+  store.commit('auth/CLEAR_AUTH')
+  router.push('/login')
 })
 
 // Listener para mudanças de tema

@@ -114,7 +114,7 @@ docker-compose ps
 ```
 
 **Credenciais de Acesso:**
-- **Usuário Admin**: admin@roteiroverade.com / admin123
+- **Usuário Admin**: admin@mundoemverade.com / admin123
 - **phpMyAdmin**: root / roteiro123
 
 ### 🔧 Desenvolvimento Local
@@ -146,7 +146,7 @@ npm run dev
 
 O banco de dados será criado automaticamente na primeira execução. Os dados iniciais incluem:
 
-*   **Usuário Admin**: admin@roteiroverade.com / admin123
+*   **Usuário Admin**: admin@mundoemverade.com / admin123
 *   **Personagens Padrão**: Liry, Zad, Kim, Camila, Texto de Ação
 
 ### 🔐 Variáveis de Ambiente
