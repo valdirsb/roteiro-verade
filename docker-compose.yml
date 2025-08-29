@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # Banco de dados MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: roteiro-verade-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: roteiro123
+      MYSQL_DATABASE: roteiro_verade
+      MYSQL_USER: roteiro_user
+      MYSQL_PASSWORD: roteiro123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init:/docker-entrypoint-initdb.d
+      - ./database/backups:/backups
+    networks:
+      - roteiro-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend Node.js
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: roteiro-verade-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: roteiro_verade
+      DB_USER: root
+      DB_PASSWORD: roteiro123
+      JWT_SECRET: sua_chave_secreta_muito_segura_aqui_para_desenvolvimento
+      JWT_EXPIRES_IN: 24h
+      JWT_REFRESH_SECRET: sua_chave_refresh_secreta_aqui_para_desenvolvimento
+      JWT_REFRESH_EXPIRES_IN: 7d
+      CORS_ORIGIN: http://localhost:8081
+      UPLOAD_PATH: ./uploads
+      MAX_FILE_SIZE: 5242880
+      LOG_LEVEL: info
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX_REQUESTS: 100
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - roteiro-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Vue.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: roteiro-verade-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - roteiro-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # phpMyAdmin (opcional - para gerenciar o banco)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: roteiro-verade-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: roteiro123
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - roteiro-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  roteiro-network:
+    driver: bridge 
