@@ -71,7 +71,11 @@ class CharacterController {
   // Criar personagem (apenas admin)
   static async createCharacter(req, res) {
     try {
-      const { name, color, avatar_url } = req.body;
+      const { name, color } = req.body;
+      let avatar_url = null;
+      if (req.file && req.file.filename) {
+        avatar_url = `/uploads/characters/${req.file.filename}`;
+      }
       
       const character = await Character.create({
         name,
@@ -110,8 +114,15 @@ class CharacterController {
   static async updateCharacter(req, res) {
     try {
       const { id } = req.params;
-      const updateData = req.body;
+
+      const { name, color, is_active } = req.body;
+
+      let avatar_url = null;
       
+      if (req.file && req.file.filename) {
+        avatar_url = `/uploads/characters/${req.file.filename}`;
+      }
+
       const character = await Character.findById(parseInt(id));
       
       if (!character) {
@@ -121,7 +132,16 @@ class CharacterController {
         });
       }
 
-      const updatedCharacter = await character.update(updateData);
+      if (avatar_url == null && character.avatar_url != null) {
+        avatar_url = character.avatar_url
+      }
+
+      const updatedCharacter = await character.update({
+        name,
+        color,
+        avatar_url,
+        is_active
+      });
 
       logger.info(`Personagem atualizado por ${req.user.username}: ${updatedCharacter.name}`);
 

@@ -9,10 +9,10 @@
         <i class="fas fa-bars"></i>
       </button>
 
-      <div class="app-header__brand">
+      <!-- <div class="app-header__brand">
         <img src="/favicon.ico" alt="Logo" class="app-header__logo" />
         <h1 class="app-header__title">Roteiro Verade</h1>
-      </div>
+      </div> -->
     </div>
 
     <div class="app-header__center">

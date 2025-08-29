@@ -8,7 +8,7 @@
     <div class="app-sidebar__content">
       <div class="app-sidebar__header">
         <div class="app-sidebar__brand">
-          <img src="/favicon.ico" alt="Logo" class="app-sidebar__logo" />
+          <img src="/logo.jpg" alt="Logo" class="app-sidebar__logo" />
           <h2 class="app-sidebar__title">Roteiro Verade</h2>
         </div>
         <button
@@ -164,9 +164,9 @@ export default {
   methods: {
     ...mapActions({
       closeSidebar: 'ui/closeSidebar',
-      logout: 'auth/logout',
-      openModal: 'ui/openModal'
+      logout: 'auth/logout'
     }),
+    ...mapActions('ui', ['openModal', 'clearModalData']),
 
     createScript() {
       this.openModal('createScript')
@@ -174,6 +174,7 @@ export default {
     },
 
     createCharacter() {
+      this.clearModalData();
       this.openModal('createCharacter')
       this.closeSidebar()
     },
@@ -252,9 +253,9 @@ export default {
 }
 
 .app-sidebar__logo {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
 }
 
 .app-sidebar__title {

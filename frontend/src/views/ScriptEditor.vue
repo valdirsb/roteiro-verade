@@ -86,7 +86,7 @@
                 @click="selectCharacter(character)"
               >
                 <div class="character-avatar" :style="{ backgroundColor: character.color }">
-                  <img v-if="character.avatar_url" :src="character.avatar_url" :alt="character.name">
+                  <img v-if="character.avatar_url" :src="getCharacterAvatarUrl(character.avatar_url)" :alt="character.name">
                   <span v-else>{{ character.name.charAt(0).toUpperCase() }}</span>
                 </div>
                 <div class="character-info">
@@ -140,7 +140,7 @@
               <div class="message-header">
                 <div class="message-character">
                   <div class="character-avatar small" :style="{ backgroundColor: message.character_color || '#6B7280' }">
-                    <img v-if="message.character_avatar" :src="message.character_avatar" :alt="message.character_name">
+                    <img v-if="message.character_avatar" :src="getCharacterAvatarUrl(message.character_avatar)" :alt="message.character_name">
                     <span v-else>{{ (message.character_name || 'Ação').charAt(0).toUpperCase() }}</span>
                   </div>
                   <span class="character-name">{{ message.character_name || 'Texto de Ação' }}</span>
@@ -296,6 +296,7 @@
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { getCharacterAvatarUrl } from '@/utils/backendConfig'
 
 export default {
   name: 'ScriptEditorPage',
@@ -727,7 +728,9 @@ export default {
       a.click()
       document.body.removeChild(a)
       window.URL.revokeObjectURL(url)
-    }
+    },
+
+    getCharacterAvatarUrl
   }
 }
 </script>

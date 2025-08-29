@@ -68,7 +68,10 @@ api.interceptors.response.use(
         localStorage.removeItem('user');
         
         // Emitir evento para o app saber que precisa redirecionar
-        window.dispatchEvent(new CustomEvent('auth:logout'));
+        // Apenas se não estivermos já fazendo logout
+        if (!window.isLoggingOut) {
+          window.dispatchEvent(new CustomEvent('auth:logout'));
+        }
       }
     }
 
@@ -197,7 +200,11 @@ export const logout = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('user');
-  window.dispatchEvent(new CustomEvent('auth:logout'));
+  
+  // Apenas disparar evento se não estivermos já fazendo logout
+  if (!window.isLoggingOut) {
+    window.dispatchEvent(new CustomEvent('auth:logout'));
+  }
 };
 
 export default api; 

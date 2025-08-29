@@ -49,6 +49,12 @@ class AuthService {
 
   // Logout do usuário
   async logout() {
+    // Marcar que estamos fazendo logout para evitar chamadas duplicadas
+    if (window.isLoggingOut) {
+      return;
+    }
+    window.isLoggingOut = true;
+
     try {
       // Tentar invalidar o token no servidor
       await apiPost('/auth/logout');
@@ -58,6 +64,10 @@ class AuthService {
     } finally {
       // Sempre limpar dados locais
       logout();
+      // Limpar a flag após um tempo para permitir novos logouts
+      setTimeout(() => {
+        window.isLoggingOut = false;
+      }, 1000);
     }
   }
 
